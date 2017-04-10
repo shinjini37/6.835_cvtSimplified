@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>cvtSimplified - Home</title>
+        <!-- Bootstrap -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+
+        <!-- Roboto Font -->
+        <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Roboto:400,700,300' />
+
+        <!-- Custom styles -->
+        <link rel='stylesheet' href='css/index.css' />
+    </head>
+    <body>
+        <div id="contents">
+            <h1>cvtSimplified</h1>
+            <div class="input"></div>
+            <div>
+                <div id="image-holder"></div>
+                <div id="result-holder"></div>
+            </div>
+            <form id="upload-image" action="/upload" method="POST" enctype="multipart/form-data">
+                <input id="file-input" type="file" name="file" size="50" />
+                <br />
+                <input type="submit" value="Upload File" />
+            </form>
+        </div>
+        <div id="scripts">
+            <!-- jQuery -->
+            <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+
+            <!-- Bootstrap (JS) -->
+            <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+            <!-- Handlebars Runtime -->
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.5/handlebars.runtime.min.js"></script>
+
+            <!-- Handlebars templates -->
+            <script src="js/templates.js"></script>
+
+            <!-- Underscore -->
+            <script src='https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js'></script>
+
+            <!--Moment.js-->
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.5.1/moment.min.js"></script>
+
+            <!-- Main JavaScript -->
+            <script src="js/index.js"></script>
+        </div>
+
+    </body>
+</html>
+

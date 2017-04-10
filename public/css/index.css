@@ -1,0 +1,9 @@
+@import url('https://fonts.googleapis.com/css?family=Asap');
+
+body {
+    font-family: 'Asap', sans-serif;
+}
+
+#image-holder, #result-holder{
+    display: inline-block;
+}
