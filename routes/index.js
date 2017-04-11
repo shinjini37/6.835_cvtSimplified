@@ -15,26 +15,35 @@ var PythonShell = require('python-shell');
 var fs = require('fs');
 var path = require('path');
 
-var multer = require('multer');
+// var multer = require('multer');
 
-var upload = multer({ dest: '/temp'});
+// var upload = multer({ dest: '/temp'});
 
 var runPython = function(scriptName, inputs, done){
-//     var pyshell = new PythonShell(scriptName);
-//     inputs.forEach(function(input){
-//         pyshell.send(input);
-//     });
-//     pyshell.end(function (err) {
-//         done(err);
-//     });
+    var pyshell = new PythonShell(scriptName);
+    inputs.forEach(function(input){
+        pyshell.send(input);
+    });
+    pyshell.end(function (err) {
+        done(err);
+    });
 };
+
+router.post('/test', function(req, res, next){
+    runPython('python/smolTest.py', [], function(){
+        res.json({success:true});
+    });
+});
+
+
 
 // router.post('/test', function(req, res, next){
 //
 // });
 
 // File input field name is simply 'file'
-router.post('/upload', upload.single('file'), function(req, res, next) {
+// router.post('/upload', upload.single('file'), function(req, res, next) {
+router.post('/upload', function(req, res, next) {
     console.log('got here at least');
     var tempPath = req.file.path;
     console.log(tempPath);
