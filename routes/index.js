@@ -19,19 +19,38 @@ var path = require('path');
 
 // var upload = multer({ dest: '/temp'});
 
-var runPython = function(scriptName, inputs, done){
-    var pyshell = new PythonShell(scriptName);
+var runPython = function(scriptName, inputs, onMessage, onDone){
+    var pyshell = new PythonShell(scriptName, { mode: 'text'});
     inputs.forEach(function(input){
         pyshell.send(input);
     });
+    pyshell.on("message", function(message){
+        if (onMessage){
+            onMessage(message);
+        }
+    });
     pyshell.end(function (err) {
-        done(err);
+        if (onDone){
+            onDone(err);
+        }
     });
 };
 
 router.post('/test', function(req, res, next){
-    runPython('python/smolTest.py', [], function(){
-        res.json({success:true});
+    var messages = [];
+    var makeOnMessageFunction = function(messages){
+        var onMessage = function(message){
+            console.log(message);
+            message = JSON.parse(message.trim());
+            messages.push(message);
+        };
+        return onMessage
+    };
+
+
+    runPython('python/smolTest.py', [], makeOnMessageFunction(messages), function(){
+        console.log(messages);
+        res.json({success:true, messages:messages});
     });
 });
 // router.post('/test', function(req, res, next){

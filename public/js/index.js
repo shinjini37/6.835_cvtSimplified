@@ -221,7 +221,7 @@ $(document).ready(function() {
             // console.log(res);
             if (JSON.parse(res.success)){
                 //$('#image-holder').html('<img src="http://localhost:3000/images/test.png" />');
-                console.log('yay!');
+                console.log(res.messages);
             }
         }
     });
