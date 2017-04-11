@@ -4,10 +4,10 @@
 
 var express = require('express');
 var router = express.Router();
-var UserModel = require('../models/User');
+//var UserModel = require('../models/User');
 
-var errorHandler = require('../models/ErrorHandler');
-var response = require('../models/Response');
+//var errorHandler = require('../models/ErrorHandler');
+//var response = require('../models/Response');
 
 //https://github.com/extrabacon/python-shell
 var PythonShell = require('python-shell');
@@ -20,13 +20,13 @@ var multer = require('multer');
 var upload = multer({ dest: '/temp'});
 
 var runPython = function(scriptName, inputs, done){
-    var pyshell = new PythonShell(scriptName);
-    inputs.forEach(function(input){
-        pyshell.send(input);
-    });
-    pyshell.end(function (err) {
-        done(err);
-    });
+//     var pyshell = new PythonShell(scriptName);
+//     inputs.forEach(function(input){
+//         pyshell.send(input);
+//     });
+//     pyshell.end(function (err) {
+//         done(err);
+//     });
 };
 
 // router.post('/test', function(req, res, next){
