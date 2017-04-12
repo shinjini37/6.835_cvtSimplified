@@ -84,6 +84,8 @@ $(document).ready(function() {
         /* stop form from submitting normally */
         event.preventDefault();
         var file = $('#file-input').get(0).files[0];
+        $('#image-holder').html('');
+        $('#result-holder').html('');
         if (file){
             var formData = new FormData();
             formData.append('file', file);
@@ -99,13 +101,14 @@ $(document).ready(function() {
                             // width: '400px',
                             // height: 'auto'
                         };
-                        var given = $('<img src="http://localhost:3000/images/image.png" />');
+                        var given = $('<img>');
+                        given.attr('src', "http://localhost:3000/images/image.png?timestamp=" + new Date().getTime());
                         given.css(css);
-                        var result = $('<img src="http://localhost:3000/images/test.png" />');
+                        var result = $('<img>');
+                        result.attr('src', "http://localhost:3000/images/test.png?timestamp=" + new Date().getTime());
                         result.css(css);
-
-                        $('#image-holder').html('').append(given);
-                        $('#result-holder').html('').append(result);
+                        $('#image-holder').append(given);
+                        $('#result-holder').append(result);
                     }
 
                 },
