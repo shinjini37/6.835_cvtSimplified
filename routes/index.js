@@ -64,7 +64,7 @@ router.post('/upload', upload.single('file'), function(req, res, next) {
     console.log(tempPath);
     // var ext = path.extname(req.file.originalname).toLowerCase();
     // var targetPath = path.resolve('python/image.'+ext);
-    var targetPath = path.resolve('python/image.png');
+    var targetPath = path.resolve('./python/image.png');
 
     console.log(targetPath);
     // if (path.extname(req.file.originalname).toLowerCase() === '.png') {
@@ -72,8 +72,8 @@ router.post('/upload', upload.single('file'), function(req, res, next) {
         fs.rename(tempPath, targetPath, function(err) {
             console.log(2);
             if (err) throw err;
-            var scriptName = 'python/opencv_test_1.py';
-            var inputs = ['python/image.png'];
+            var scriptName = './python/opencv_test_1.py';
+            var inputs = ['./python/image.png'];
             var messages = [];
             var makeOnMessageFunction = function(messages){
                 var onMessage = function(message){
