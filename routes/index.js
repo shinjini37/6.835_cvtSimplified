@@ -17,7 +17,7 @@ var path = require('path');
 
 var multer = require('multer');
 
-var upload = multer({ dest: './tempStore'});
+var upload = multer({ dest: './temp'});
 
 var runPython = function(scriptName, inputs, onMessage, onDone){
     var pyshell = new PythonShell(scriptName, { mode: 'text'});
@@ -47,19 +47,18 @@ router.post('/test', function(req, res, next){
         return onMessage
     };
 
-
-    runPython('python/smolTest.py', [], makeOnMessageFunction(messages), function(){
-        console.log(messages);
+    var onDone = function(){
         res.json({success:true, messages:messages});
-    });
+    };
+
+    runPython('python/smolTest.py', [], makeOnMessageFunction(messages), onDone);
 });
 // router.post('/test', function(req, res, next){
 //
 // });
 
 // File input field name is simply 'file'
-// router.post('/upload', upload.single('file'), function(req, res, next) {
-router.post('/upload', function(req, res, next) {
+router.post('/upload', upload.single('file'), function(req, res, next) {
     console.log('got here at least');
     var tempPath = req.file.path;
     console.log(tempPath);
@@ -75,11 +74,23 @@ router.post('/upload', function(req, res, next) {
             if (err) throw err;
             var scriptName = 'python/opencv_test_1.py';
             var inputs = ['python/image.png'];
-            runPython(scriptName, inputs, function(err){
+            var messages = [];
+            var makeOnMessageFunction = function(messages){
+                var onMessage = function(message){
+                    console.log(message);
+                    message = JSON.parse(message.trim());
+                    messages.push(message);
+                };
+                return onMessage
+            };
+
+            var onDone = function(err){
                 if (err) throw err;
                 console.log('finished');
-                res.json({success:true});
-            });
+                res.json({success:true, messages:messages});
+            };
+
+            runPython(scriptName, inputs, makeOnMessageFunction(messages), onDone);
         });
     // } else {
     //     fs.unlink(tempPath, function () {
