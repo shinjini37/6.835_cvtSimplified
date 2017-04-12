@@ -67,46 +67,72 @@ router.post('/upload', upload.single('file'), function(req, res, next) {
     var targetPath = path.resolve('./python/image.png');
 
     console.log(targetPath);
-    // if (path.extname(req.file.originalname).toLowerCase() === '.png') {
-        console.log(1);
-        fs.rename(tempPath, targetPath, function(err) {
-            console.log(2);
+    console.log(1);
+    fs.rename(tempPath, targetPath, function(err) {
+        console.log(2);
+        if (err) throw err;
+        var scriptName = './python/write_to_public.py';
+        var inputs = ['./python/image.png'];
+
+        runPython(scriptName, inputs, null, function(err){
             if (err) throw err;
-            var scriptName = './python/opencv_test_1.py';
-            var inputs = ['./python/image.png'];
-            var messages = [];
-            var makeOnMessageFunction = function(messages){
-                var onMessage = function(message){
-                    console.log(message);
-                    message = JSON.parse(message.trim());
-                    messages.push(message);
-                };
-                return onMessage
-            };
-
-            var onDone = function(err){
-                if (err) throw err;
-                console.log('finished');
-                res.json({success:true, messages:messages});
-            };
-
-            runPython(scriptName, inputs, makeOnMessageFunction(messages), onDone);
+            res.json({success:true});
         });
-    // } else {
-    //     fs.unlink(tempPath, function () {
-    //         console.log(3);
-    //         if (err) throw err;
-    //         res.json({success:false});
-    //     });
-    // }
-    // console.log(req.file);
-    // fs.writeFile('temp/upload.png', req.file, function(err, data) {
-    //         if (err) throw err; // Fail if the file can't be read.
-    //         res.json({success:true});
-    //     });
-    // res.json({success:true});
+    });
+});
+
+router.get('/result', function(req, res, next) {
+    console.log('got here at least 2 ');
+    var scriptName = './python/opencv_test_3.py';
+    var inputs = ['./python/image.png', 'None'];
+    var messages = [];
+    var makeOnMessageFunction = function(messages){
+        var onMessage = function(message){
+            console.log(message);
+            message = JSON.parse(message.trim());
+            messages.push(message);
+        };
+        return onMessage
+    };
+
+    var onDone = function(err){
+        if (err) throw err;
+        console.log('finished');
+        res.json({success:true, messages:messages});
+    };
+
+    runPython(scriptName, inputs, makeOnMessageFunction(messages), onDone);
 
 });
+
+router.post('/corners', function(req, res, next) {
+    console.log('got here at least 3 ');
+    var corners = req.body.corners || "None";
+    console.log(corners);
+    var cornersString = JSON.stringify(corners);
+    console.log(cornersString);
+    var scriptName = './python/opencv_test_3.py';
+    var inputs = ['./python/image.png', cornersString];
+    var messages = [];
+    var makeOnMessageFunction = function(messages){
+        var onMessage = function(message){
+            console.log(message);
+            message = JSON.parse(message.trim());
+            messages.push(message);
+        };
+        return onMessage
+    };
+
+    var onDone = function(err){
+        if (err) throw err;
+        console.log('finished');
+        res.json({success:true, messages:messages});
+    };
+
+    runPython(scriptName, inputs, makeOnMessageFunction(messages), onDone);
+
+});
+
 
 //
 // /**

@@ -104,13 +104,21 @@ $(document).ready(function() {
                         var given = $('<img>');
                         given.attr('src', "http://localhost:3000/images/image.png?timestamp=" + new Date().getTime());
                         given.css(css);
-                        var result = $('<img>');
-                        result.attr('src', "http://localhost:3000/images/test.png?timestamp=" + new Date().getTime());
-                        result.css(css);
                         $('#image-holder').append(given);
-                        $('#result-holder').append(result);
-                    }
 
+                        $.ajax({
+                            url: '/result',
+                            type: 'GET',
+                            success: function (res) {
+                                if (JSON.parse(res.success)) {
+                                    var result = $('<img>');
+                                    result.attr('src', "http://localhost:3000/images/test.png?timestamp=" + new Date().getTime());
+                                    result.css(css);
+                                    $('#result-holder').append(result);
+                                }
+                            }
+                        });
+                    }
                 },
                 cache: false,
                 contentType: false,
