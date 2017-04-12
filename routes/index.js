@@ -15,9 +15,9 @@ var PythonShell = require('python-shell');
 var fs = require('fs');
 var path = require('path');
 
-// var multer = require('multer');
+var multer = require('multer');
 
-// var upload = multer({ dest: '/temp'});
+var upload = multer({ dest: '/temp'});
 
 var runPython = function(scriptName, inputs, onMessage, onDone){
     var pyshell = new PythonShell(scriptName, { mode: 'text'});
