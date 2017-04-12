@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-##from matplotlib import pyplot as plt
+from matplotlib import pyplot as plt
 
 
 def get_edges(img):
@@ -14,7 +14,7 @@ def get_circles(img):
     cimg = cv2.medianBlur(img,5)
 
 
-    circles = cv2.HoughCircles(cimg,cv2.HOUGH_GRADIENT,1,20,
+    circles = cv2.HoughCircles(cimg,cv2.cv.CV_HOUGH_GRADIENT,1,20,
                                 param1=50,param2=30,minRadius=0,maxRadius=0)
 
     if (circles is not None):
@@ -54,7 +54,7 @@ if (img is not None):
     img = shrink_to_size(cv2.imread(path,0))
     result = get_edges(get_circles(img))
     write_result(img, result)
-
+##
 ##    plt.subplot(121),plt.imshow(img,cmap = 'gray')
 ##    plt.title('Original Image'), plt.xticks([]), plt.yticks([])
 ##    plt.subplot(122),plt.imshow(result,cmap = 'gray')
