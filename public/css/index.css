@@ -13,10 +13,15 @@ body {
     background: lightgrey;
 }
 
-#image-holder > img, #result-holder > img{
+#image-holder > img, #result-holder > img, #input-canvas{
     margin: 20px auto;
 }
 
 #file-input{
     color: transparent;
+}
+
+#input-canvas{
+    position: absolute;
+    pointer-events: none;
 }

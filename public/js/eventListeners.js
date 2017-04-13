@@ -6,6 +6,8 @@ var skew = Skew();
 var imgCss = {};
 
 $(document).ready(function(){
+    var inputCanvas = InputCanvas($('#input-canvas'));
+
     var updateCorners = function(corners){
         console.log(corners);
         var cornerListElt = $("#corners");
@@ -16,13 +18,15 @@ $(document).ready(function(){
             elt.text('x: '+xy[0]+', y: '+xy[1]);
             cornerListElt.append(elt);
         });
+        inputCanvas.drawPoints(corners);
 
     };
 
 
     var refreshImage = function(ratio, width, height){
         skew.resetCorners(width, height);
-        updateCorners(skew.getPoints());
+        inputCanvas.updateCanvasDimensions(width, height);
+        updateCorners(skew.getAppScalePoints());
         if (ratio){
             skew.updateRatio(ratio);
         }
@@ -33,7 +37,7 @@ $(document).ready(function(){
             var y = e.pageY - offset.top;
 
             skew.updatePoints([x,y]);
-            updateCorners(skew.getPoints());
+            updateCorners(skew.getAppScalePoints());
         });
     };
 
@@ -44,7 +48,6 @@ $(document).ready(function(){
         $('#result-holder').html('');
         $.ajax({
             url: '/corners',
-            // Form data
             data: {corners: corners},
             type: 'POST',
             //Ajax events
@@ -68,8 +71,8 @@ $(document).ready(function(){
         event.preventDefault();
         var file = fileInputElt.get(0).files[0];
         if (file){
-            $('#image-holder').html('');
-            $('#result-holder').html('');
+            $('#image-holder img').remove();
+            $('#result-holder img').remove();
 
             var formData = new FormData();
             formData.append('file', file);
@@ -82,18 +85,18 @@ $(document).ready(function(){
                 success: function (res) {
                     if (JSON.parse(res.success)){
                         var ratio = res.ratio;
-                        var height = res.height;
-                        var width = res.width;
+                        var height = res.height/ratio;
+                        var width = res.width/ratio;
                         imgCss = {
-                            height: height/ratio,
-                            width: width/ratio
+                            height: height,
+                            width: width
                         };
 
                         var given = $('<img>');
                         given.attr('src', "http://localhost:3000/images/image.png?timestamp=" + new Date().getTime());
                         given.css(imgCss);
                         $('#image-holder').append(given);
-                        refreshImage(ratio, height, width);
+                        refreshImage(ratio, width, height);
 
                         $.ajax({
                             url: '/result',

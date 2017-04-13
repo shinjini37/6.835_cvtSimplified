@@ -29,8 +29,12 @@
                 </form>
             </div>
             <div class="edit-area row">
-                <div id="image-holder" class="col"></div>
-                <div id="result-holder" class="col"></div>
+                <div id="image-holder" class="col">
+                    <canvas id="input-canvas" width="0" height="0"></canvas>
+                </div>
+                <div id="result-holder" class="col">
+
+                </div>
             </div>
 
         </div>
@@ -45,7 +49,7 @@
             <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.5/handlebars.runtime.min.js"></script>
 
             <!-- Handlebars templates -->
-            <script src="js/templates.js"></script>
+            <!--<script src="js/templates.js"></script>-->
 
             <!-- Underscore -->
             <script src='https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js'></script>
@@ -55,6 +59,7 @@
 
             <!-- Main JavaScript -->
             <script src="js/Skew.js"></script>
+            <script src="js/InputCanvas.js"></script>
             <script src="js/eventListeners.js"></script>
             <script src="js/index.js"></script>
         </div>
