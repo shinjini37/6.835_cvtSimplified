@@ -5,6 +5,7 @@ var skew = Skew();
 
 $(document).ready(function(){
     var updateCorners = function(corners){
+        console.log(corners);
         var cornerListElt = $("#corners");
         cornerListElt.html('');
         corners.forEach(function(xy){
@@ -16,9 +17,10 @@ $(document).ready(function(){
 
     };
 
-    $('#result-holder').click(function(e){
-        var resultHolder = $(this);
-        var offset = resultHolder.offset();
+    updateCorners(skew.getPoints());
+    $('#image-holder').click(function(e){
+        var imageHolder = $(this);
+        var offset = imageHolder.offset();
         var x = e.pageX - offset.left;
         var y = e.pageY - offset.top;
 
@@ -27,7 +29,9 @@ $(document).ready(function(){
     });
 
     $('#update-corners').click(function(){
-        var corners = skew.getPoints();
+        var corners = JSON.stringify(skew.getPoints());
+        console.log(corners);
+        $('#result-holder').html('');
         $.ajax({
             url: '/corners',
             // Form data
@@ -38,7 +42,6 @@ $(document).ready(function(){
                 if (JSON.parse(res.success)){
                     var result = $('<img>');
                     result.attr('src', "http://localhost:3000/images/test.png?timestamp=" + new Date().getTime());
-                    result.css(css);
                     $('#result-holder').append(result);
                 }
             }

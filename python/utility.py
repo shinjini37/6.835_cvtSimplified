@@ -31,15 +31,25 @@ def write_result(image=None, result=None):
     
 def shrink_to_size(img):
     height, width = img.shape[:2]
-    max_height = min(height, 400)
-    max_width = min(width, 400)
+    MAX = 525
+    
+    max_height = min(height, MAX)
+    max_width = min(width, MAX)
+
+    if (height>width):
+        max_dim = 'height'
+    else:
+        max_dim = 'width'
     resize = False
-    if (height>max_height):
-        ratio = float(max_height)/height
-        resize = True
-    elif (width>max_width):
-        ratio = float(max_width)/width
-        resize = True
+
+    if (max_dim == 'height'):
+        if (height>max_height):
+            ratio = float(max_height)/height
+            resize = True
+    else:
+        if (width>max_width):
+            ratio = float(max_width)/width
+            resize = True
     if (resize):
         img = cv2.resize(img,(int(ratio*width), int(ratio*height)), interpolation = cv2.INTER_AREA)
     return img

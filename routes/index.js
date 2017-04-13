@@ -108,16 +108,15 @@ router.get('/result', function(req, res, next) {
 router.post('/corners', function(req, res, next) {
     console.log('got here at least 3 ');
     var corners = req.body.corners || "None";
+    console.log(req.body);
     console.log(corners);
-    var cornersString = JSON.stringify(corners);
-    console.log(cornersString);
     var scriptName = './python/opencv_test_3.py';
-    var inputs = ['./python/image.png', cornersString];
+    var inputs = ['./python/image.png', corners];
     var messages = [];
     var makeOnMessageFunction = function(messages){
         var onMessage = function(message){
             console.log(message);
-            message = JSON.parse(message.trim());
+            // message = JSON.parse(message.trim());
             messages.push(message);
         };
         return onMessage

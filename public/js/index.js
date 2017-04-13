@@ -97,13 +97,8 @@ $(document).ready(function() {
                 //Ajax events
                 success: function (res) {
                     if (JSON.parse(res.success)){
-                        var css = {
-                            // width: '400px',
-                            // height: 'auto'
-                        };
                         var given = $('<img>');
                         given.attr('src', "http://localhost:3000/images/image.png?timestamp=" + new Date().getTime());
-                        given.css(css);
                         $('#image-holder').append(given);
 
                         $.ajax({
@@ -113,7 +108,6 @@ $(document).ready(function() {
                                 if (JSON.parse(res.success)) {
                                     var result = $('<img>');
                                     result.attr('src', "http://localhost:3000/images/test.png?timestamp=" + new Date().getTime());
-                                    result.css(css);
                                     $('#result-holder').append(result);
                                 }
                             }
