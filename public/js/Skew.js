@@ -4,10 +4,25 @@
 var Skew = function(){
     var that = Object.create(Skew.prototype);
 
-    var points = [[0,0], [0,0],[0,0],[0,0]];
+    var origCorners = [[0,0], [0,0], [0,0], [0,0]];
+    var points = [[0,0], [0,0], [0,0], [0,0]];
+    var ratio = 1;
+
+    that.resetCorners = function(width, height){
+        if (width){
+            points = [[0,0], [width,0], [width,height], [height,0]];
+        } else {
+            points = JSON.parse(JSON.stringify(origCorners));
+        }
+    };
+
+    that.updateRatio = function(newRatio){
+        ratio = newRatio;
+    };
 
     that.updatePoints = function(point){
-        points.push(point);
+        var corner = [point[0]*ratio, point[1]*ratio];
+        points.push(corner);
         points.shift()
     };
 
@@ -16,6 +31,6 @@ var Skew = function(){
     };
 
 
-    Object.freeze(that)
+    Object.freeze(that);
     return that;
 };

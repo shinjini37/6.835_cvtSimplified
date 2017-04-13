@@ -79,50 +79,6 @@ $(document).ready(function() {
     //     });
     // };
 
-    $("#upload-image").submit(function(event) {
-
-        /* stop form from submitting normally */
-        event.preventDefault();
-        var file = $('#file-input').get(0).files[0];
-        $('#image-holder').html('');
-        $('#result-holder').html('');
-        if (file){
-            var formData = new FormData();
-            formData.append('file', file);
-            $.ajax({
-                url: '/upload',
-                // Form data
-                data: formData,
-                type: 'POST',
-                //Ajax events
-                success: function (res) {
-                    if (JSON.parse(res.success)){
-                        var given = $('<img>');
-                        given.attr('src', "http://localhost:3000/images/image.png?timestamp=" + new Date().getTime());
-                        $('#image-holder').append(given);
-
-                        $.ajax({
-                            url: '/result',
-                            type: 'GET',
-                            success: function (res) {
-                                if (JSON.parse(res.success)) {
-                                    var result = $('<img>');
-                                    result.attr('src', "http://localhost:3000/images/test.png?timestamp=" + new Date().getTime());
-                                    $('#result-holder').append(result);
-                                }
-                            }
-                        });
-                    }
-                },
-                cache: false,
-                contentType: false,
-                processData: false
-            });
-        } else {
-            alert("Please choose a file!");
-        }
-
-    });
 
     // $.get('auth/signin', function(res){ // check this just in case
     //     if (JSON.parse(res.success)){

@@ -19,6 +19,8 @@ var multer = require('multer');
 
 var upload = multer({ dest: './temp'});
 
+var RATIO = 600/400;
+
 var runPython = function(scriptName, inputs, onMessage, onDone){
     var pyshell = new PythonShell(scriptName, { mode: 'text'});
     inputs.forEach(function(input){
@@ -73,10 +75,24 @@ router.post('/upload', upload.single('file'), function(req, res, next) {
         if (err) throw err;
         var scriptName = './python/write_to_public.py';
         var inputs = ['./python/image.png'];
-
-        runPython(scriptName, inputs, null, function(err){
+        var height = 0;
+        var width = 0;
+        var onMessage = function(message){
+            console.log('message: ', message);
+            message = message.trim();
+            var messageComps = message.split(',');
+            console.log(messageComps);
+            if (messageComps[0] == "width"){
+                width = parseInt(messageComps[1]);
+            } else if (messageComps[0] == "height") {
+                height = parseInt(messageComps[1]);
+            }
+            console.log(1, width, height);
+        };
+        runPython(scriptName, inputs, onMessage, function(err){
             if (err) throw err;
-            res.json({success:true});
+            console.log(2, width, height);
+            res.json({success:true, ratio: RATIO, height: height, width: width});
         });
     });
 });

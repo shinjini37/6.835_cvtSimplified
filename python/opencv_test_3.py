@@ -43,7 +43,6 @@ def get_lines(img, ref_img = None):
     if (ref_img is None):
         ref_img = cv2.cvtColor(img,cv2.COLOR_GRAY2BGR)
     inv_img = cv2.bitwise_not(img)
-##    print img
 ##    gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
 ##    edges = cv2.Canny(img,50,150,apertureSize = 3)
 ##    edges = get_edges(img)
@@ -84,11 +83,12 @@ def get_corners(img, ref_img = None):
     corner_img = ref_img
     
     corners = cv2.goodFeaturesToTrack(img,25,0.1,100)
-    corners = np.int0(corners)
+    if (corners is not None):
+        corners = np.int0(corners)
 
-    for i in corners:
-        x,y = i.ravel()
-        cv2.circle(corner_img,(x,y),3,255,-1)
+        for i in corners:
+            x,y = i.ravel()
+            cv2.circle(corner_img,(x,y),3,255,-1)
     return corner_img
 
 def correct_skew(img, corners):
@@ -146,7 +146,6 @@ def correct_skew(img, corners):
 
     corners = order_corners(corners)
     corrected_corners, orientation = get_corrected_corners(corners)
-    print(corrected_corners, orientation)
     pts1 = np.float32([corners])
     pts2 = np.float32([corrected_corners])
 
@@ -156,8 +155,8 @@ def correct_skew(img, corners):
 
     return dst
   
-path = raw_input('path: ')
-corners = raw_input('corners: ')
+path = raw_input()
+corners = raw_input()
 
 
 ##path = 'line_circ.jpg'
@@ -169,7 +168,6 @@ img = cv2.imread(path,0)
 if (img is not None):
     img = utils.shrink_to_size(img)
     if (corners != 'None'):
-        print ('corners are ', corners)
         img = correct_skew(img, eval(corners))
 
     ref_img = cv2.cvtColor(img,cv2.COLOR_GRAY2BGR)

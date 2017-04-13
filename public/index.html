@@ -14,22 +14,24 @@
     <body>
         <div id="contents">
             <h1>cvtSimplified</h1>
-            <div id="corners-container">
-                <ul id="corners">
 
-                </ul>
-                <button id="update-corners">Update Corners</button>
+            <div class="options">
+                <div id="corners-container">
+                    <ul id="corners">
+
+                    </ul>
+                    <button id="update-corners">Update Corners</button>
+                </div>
+                <form id="upload-image" action="/upload" method="POST" enctype="multipart/form-data">
+                    <input id="file-input" type="file" name="file" size="50" value="Upload"/>
+                    <!--<br />-->
+                    <!--<input type="submit" value="Upload File" />-->
+                </form>
             </div>
-            <div class="input"></div>
-            <div>
-                <div id="image-holder"></div>
-                <div id="result-holder"></div>
+            <div class="edit-area row">
+                <div id="image-holder" class="col"></div>
+                <div id="result-holder" class="col"></div>
             </div>
-            <form id="upload-image" action="/upload" method="POST" enctype="multipart/form-data">
-                <input id="file-input" type="file" name="file" size="50" />
-                <br />
-                <input type="submit" value="Upload File" />
-            </form>
 
         </div>
         <div id="scripts">

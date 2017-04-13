@@ -6,4 +6,17 @@ body {
 
 #image-holder, #result-holder{
     display: inline-block;
+    text-align: center;
+    width: 450px;
+    height: 450px;
+    border: 1px darkgray solid;
+    background: lightgrey;
+}
+
+#image-holder > img, #result-holder > img{
+    margin: 20px auto;
+}
+
+#file-input{
+    color: transparent;
 }

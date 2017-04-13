@@ -29,12 +29,14 @@ def write_result(image=None, result=None):
     if (result is not None):
         cv2.imwrite('./public/images/test.png', result)
     
-def shrink_to_size(img):
+def shrink_to_size(img, get_dims = False):
     height, width = img.shape[:2]
-    MAX = 525
+    MAX = 600
     
     max_height = min(height, MAX)
     max_width = min(width, MAX)
+
+    ratio = 1
 
     if (height>width):
         max_dim = 'height'
@@ -51,6 +53,10 @@ def shrink_to_size(img):
             ratio = float(max_width)/width
             resize = True
     if (resize):
-        img = cv2.resize(img,(int(ratio*width), int(ratio*height)), interpolation = cv2.INTER_AREA)
+        height = int(ratio*height)
+        width = int(ratio*width)
+        img = cv2.resize(img,(width, height), interpolation = cv2.INTER_AREA)
+    if get_dims:
+        return (img, width, height)
     return img
   
