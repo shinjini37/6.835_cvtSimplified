@@ -17,10 +17,10 @@ var InputCanvas = function(canvasElt){
             var radius = 3;
             context.beginPath();
             context.arc(point[0], point[1], radius, 0, 2 * Math.PI, false);
-            context.fillStyle = 'green';
+            context.fillStyle = '#D2A8FF';
             context.fill();
-            context.lineWidth = 5;
-            context.strokeStyle = '#003300';
+            context.lineWidth = 2;
+            context.strokeStyle = '#75519C';
             context.stroke();
             context.closePath();
         });

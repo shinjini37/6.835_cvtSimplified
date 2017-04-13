@@ -24,12 +24,12 @@ $(document).ready(function(){
 
 
     var refreshImage = function(ratio, width, height){
-        skew.resetCorners(width, height);
-        inputCanvas.updateCanvasDimensions(width, height);
-        updateCorners(skew.getAppScalePoints());
         if (ratio){
             skew.updateRatio(ratio);
         }
+        skew.resetCorners(width, height);
+        inputCanvas.updateCanvasDimensions(width, height);
+        updateCorners(skew.getAppScalePoints());
         $('#image-holder img').unbind().click(function(e){
             var image = $(this);
             var offset = image.offset();
