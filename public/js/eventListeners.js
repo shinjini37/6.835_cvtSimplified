@@ -54,7 +54,7 @@ $(document).ready(function(){
             success: function (res) {
                 if (JSON.parse(res.success)){
                     var result = $('<img>');
-                    result.attr('src', "http://localhost:3000/images/test.png?timestamp=" + new Date().getTime());
+                    result.attr('src', "http://localhost:3000/images/result.png?timestamp=" + new Date().getTime());
                     result.css(imgCss);
                     $('#result-holder').append(result);
                 }
@@ -104,7 +104,7 @@ $(document).ready(function(){
                             success: function (res) {
                                 if (JSON.parse(res.success)) {
                                     var result = $('<img>');
-                                    result.attr('src', "http://localhost:3000/images/test.png?timestamp=" + new Date().getTime());
+                                    result.attr('src', "http://localhost:3000/images/result.png?timestamp=" + new Date().getTime());
                                     result.css(imgCss);
                                     $('#result-holder').append(result);
                                     fileInputElt.val('');

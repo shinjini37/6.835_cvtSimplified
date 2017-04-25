@@ -32,15 +32,15 @@ def get_circles(img, ref_img = None):
     if (circles is None):
         circles = [[]]
     circles = np.uint16(np.around(circles))
-    for circle in circles[0]:
-        x = circle[0]
-        y = circle[1]
-        r = circle[2]
-        if (r*2 <= height and r*2 <= width):
-            # draw the outer circle
-            cv2.circle(circle_img,(x,y),r,(0,255,0),2)
-            # draw the center of the circle
-            cv2.circle(circle_img,(x,y),2,(0,0,255),3)
+##    for circle in circles[0]:
+##        x = circle[0]
+##        y = circle[1]
+##        r = circle[2]
+##        if (r*2 <= height and r*2 <= width):
+##            # draw the outer circle
+##            cv2.circle(circle_img,(x,y),r,(0,255,0),2)
+##            # draw the center of the circle
+##            cv2.circle(circle_img,(x,y),2,(0,0,255),3)
 
     return (circle_img, circles)
 
@@ -274,8 +274,8 @@ corners = raw_input()
 ##path = 'pic_lib/1.jpg'
 ##path = 'pic_lib/straight1.jpg'
 ####path = 'pic_lib/line_circ.jpg'
-####path = 'pic_lib/circ.jpg'
-####path = 'pic_lib/skewed.jpg'
+##path = 'pic_lib/circ.jpg'
+##path = 'pic_lib/skewed.jpg'
 ##corners = 'None'
 
 img = cv2.imread(path,0)
@@ -310,8 +310,8 @@ if (img is not None):
 ##    print 3
 ##
     circles = processing.get_best_circles(circles, merged_line)
-##
-##    print 4
+####
+####    print 4
     for circle, got_circle, used_lines in circles:
         x = circle[0]
         y = circle[1]
