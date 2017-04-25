@@ -3,6 +3,8 @@ import numpy as np
 from matplotlib import pyplot as plt
 import utility as utils
 import processing
+import math
+import line_merge
 
 def get_edges(img):
     edges = cv2.Canny(img,100,200)
@@ -47,34 +49,51 @@ def get_circles(img, ref_img = None):
 
 
 def get_lines(img, ref_img = None, params = None):
-    if (ref_img is None):
-        ref_img = cv2.cvtColor(img,cv2.COLOR_GRAY2BGR)
+    height, width = img.shape[:2]
+    
+    if params is None:
+        minLineLength = 1
+        maxLineGap = 1
+        threshold = 25 #25
+        blur = 3
+    else:
+        minLineLength = params["minLineLength"]
+        maxLineGap = params["maxLineGap"]
+        threshold = params["threshold"]
+        blur = params["blur"]
+
     inv_img = cv2.bitwise_not(img)
-##    inv_img = cv2.medianBlur(inv_img,5)
+    if blur is not None:
+        inv_img = cv2.medianBlur(inv_img,blur)
+    if (ref_img is None):
+        ref_img = cv2.cvtColor(inv_img,cv2.COLOR_GRAY2BGR)
+    
 ##    gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
 ##    edges = cv2.Canny(img,50,150,apertureSize = 3)
 ##    edges = get_edges(img)
     line_img = ref_img
 
-    if params is None:
-        minLineLength = 1
-        maxLineGap = 1
-        threshold = 25 #25
-    else:
-        minLineLength = params["minLineLength"]
-        maxLineGap = params["maxLineGap"]
-        threshold = params["threshold"]
-            
+    blank_image = cv2.bitwise_not(np.zeros((height,width,3), np.uint8))
+    
     lines = cv2.HoughLinesP(inv_img,1,np.pi/180,threshold,minLineLength,maxLineGap)
 
     if (lines is None):
         lines = []
-        
+
+    print len(lines)
     for line in lines:
         for x1,y1,x2,y2 in line:
-            cv2.line(line_img,(x1,y1),(x2,y2),(0,255,0), 10)
+            cv2.line(line_img,(x1,y1),(x2,y2),(255,0,0), 3)
+            cv2.line(blank_image,(x1,y1),(x2,y2),(0,0,0), 1)
 
-
+    merged_lines = line_merge.merge_lines(lines)
+    for line in merged_lines:
+        for x1,y1,x2,y2 in line:
+            cv2.line(line_img,(x1,y1),(x2,y2),(0,255,0), 3)
+    
+    
+    blank_image = cv2.cvtColor(blank_image,cv2.COLOR_BGR2GRAY)
+    
 ##    lines = cv2.HoughLines(edges,1,np.pi/180,200)
    
 ##    for line in lines:
@@ -89,7 +108,7 @@ def get_lines(img, ref_img = None, params = None):
 ##            y2 = int(y0 - 1000*(a))
 ##
 ##            cv2.line(line_img,(x1,y1),(x2,y2),(0,0,255),2)
-    return (line_img, lines)
+    return (line_img, lines, merged_lines, blank_image)
 
 
 
@@ -179,15 +198,57 @@ def correct_skew(img, corners):
 
 
 def get_page_corners(img):
-    params = {
-        "minLineLength": 4000000,
-        "maxLineGap": 100,
-        "threshold":250
+    params = { ## tested good values
+        "minLineLength": 4,
+        "maxLineGap": 50,
+        "threshold": 150,
+        "blur": 7
         }
-    result, lines = get_lines(img, params = params)
 
-    height, width = img.shape[:2]
+    result, lines, merged_lines, bin_lines = get_lines(img, params = params)
+
+##    bin_lines = cv2.bitwise_not(bin_lines)
+
+##    params = {
+##        "minLineLength": 4,
+##        "maxLineGap": 100,
+##        "threshold": 50,
+##        "blur": None
+##        }
+##
+##    result, lines, bin_lines = get_lines(bin_lines, params = params)
+##    
+##    print lines
+##    def get_angle(line):
+##        for x1,y1,x2,y2 in line:
+##            angle = math.degrees(math.atan((y1-y2)/float(x1-x2)))%180
+##        return angle
+##
+##    for line in lines:
+##        print get_angle(line)
+##    
+##    plt.subplot(121), plt.imshow(img,cmap = 'gray')
+##    plt.title('Original Image'), plt.xticks([]), plt.yticks([])
+##    plt.subplot(122),plt.imshow(result,cmap = 'gray')
+##    plt.title('Edge Image'), plt.xticks([]), plt.yticks([])    
+##    plt.show()
     
+    height, width = img.shape[:2]
+##
+##    img_corners = [[0,0], [width, 0], [width, height], [0, height]]
+##    corners = []
+##    
+##    for img_corner in img_corners:
+##        min_dist = float('inf')
+##        best_corner = None
+##        for line in merged_lines:
+##            dist, intersect = line_merge.dist_from_point_to_line_segment(img_corner, line)
+##            if (dist<min_dist):
+##                min_dist = dist
+##                best_corner = intersect
+##        print best_corner
+##        corners.append(best_corner)
+####    
     max_x = 0
     max_y = 0
     min_x = width
@@ -224,10 +285,11 @@ def get_page_corners(img):
 ##corners = raw_input()
 
 
-##path = 'pic_lib/1.jpg'
+path = 'pic_lib/1.jpg'
 path = 'pic_lib/straight1.jpg'
 ##path = 'pic_lib/line_circ.jpg'
 ##path = 'pic_lib/circ.jpg'
+##path = 'pic_lib/skewed.jpg'
 corners = 'None'
 
 img = cv2.imread(path,0)
@@ -247,38 +309,45 @@ if (img is not None):
             cv2.THRESH_BINARY,11,2)
 ####    result = get_edges(get_circles(result))
 
-    result, circles = get_circles(img_bin)#, ref_img = ref_img)
-    result, lines = get_lines(img_bin)#, ref_img = ref_img)
+##    params = {
+##        "minLineLength": 4,
+##        "maxLineGap": 50,
+##        "threshold": 150,
+##        "blur": 7
+##        }
 
-    circles = processing.get_best_circles(circles, lines)
-
-    for circle, got_circle, lines in circles:
-        x = circle[0]
-        y = circle[1]
-        r = circle[2]
-
-        xc = int(got_circle[0])
-        yc = int(got_circle[1])
-        R = int(got_circle[2])
-
-        
-        # draw the outer circle
+##    result, circles = get_circles(img_bin)#, ref_img = ref_img)
+##    result, lines, merged_line, bin_lines = get_lines(img_bin)#, params = params)#, ref_img = ref_img)
+##
+##    circles = processing.get_best_circles(circles, lines)
+##
+##    for circle, got_circle, lines in circles:
+##        x = circle[0]
+##        y = circle[1]
+##        r = circle[2]
+##
+##        xc = int(got_circle[0])
+##        yc = int(got_circle[1])
+##        R = int(got_circle[2])
+##
+##        
+##        # draw the outer circle
 ##        cv2.circle(img,(x,y),r,(0,255,0),2)
 ##        # draw the center of the circle
 ##        cv2.circle(img,(x,y),2,(0,0,255),3)
+##
+##        # draw the outer circle
+##        cv2.circle(img,(xc,yc),R,(0,255,0),2)
+##        # draw the center of the circle
+##        cv2.circle(img,(xc,yc),3,(0,0,255),3)
+##        
+##
+##        for line in lines:
+##            for x1,y1,x2,y2 in line:
+##                cv2.line(img,(x1,y1),(x2,y2),(0,255,0), 10)
+##
 
-        # draw the outer circle
-        cv2.circle(img,(xc,yc),R,(0,255,0),2)
-        # draw the center of the circle
-        cv2.circle(img,(xc,yc),3,(0,0,255),3)
-        
-
-        for line in lines:
-            for x1,y1,x2,y2 in line:
-                cv2.line(img,(x1,y1),(x2,y2),(0,255,0), 10)
-
-
-##    result = get_page_corners(img_bin)
+    result = get_page_corners(img_bin)
 ##    result = get_corners(img_bin, ref_img = ref_img)
 ##    utils.write_result(result = result)
 
