@@ -270,20 +270,23 @@ def merge_lines_helper(lines):
 ##        print group
 ##        for line in group:
 ##            print get_angle(line)
-        print merged_line
-        print get_angle(merged_line)
+##        print merged_line
+##        print get_angle(merged_line)
         merged_lines.append(merged_line)
-    print len(groups)
+##    print len(groups)
     return merged_lines
 
 def merge_lines(lines):
+    max_iter = 10
+    count = 0
     num_lines = len(lines)
     merged_lines = lines
     done = False
     while not done:
+        count += 1
         merged_lines = merge_lines_helper(merged_lines)
         num_merged_lines = len(merged_lines)
-        if (num_merged_lines == num_lines):
+        if (num_merged_lines == num_lines) or (count == max_iter):
             done = True
         else:
             num_lines = num_merged_lines

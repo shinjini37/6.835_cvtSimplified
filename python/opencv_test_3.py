@@ -79,35 +79,20 @@ def get_lines(img, ref_img = None, params = None):
 
     if (lines is None):
         lines = []
-
-    print len(lines)
+##    print len(lines)
     for line in lines:
         for x1,y1,x2,y2 in line:
-            cv2.line(line_img,(x1,y1),(x2,y2),(255,0,0), 3)
+            cv2.line(line_img,(x1,y1),(x2,y2),(0,255,0), 3)
             cv2.line(blank_image,(x1,y1),(x2,y2),(0,0,0), 1)
 
     merged_lines = line_merge.merge_lines(lines)
     for line in merged_lines:
         for x1,y1,x2,y2 in line:
-            cv2.line(line_img,(x1,y1),(x2,y2),(0,255,0), 3)
+            cv2.line(line_img,(x1,y1),(x2,y2),(255,255,0), 3)
     
     
     blank_image = cv2.cvtColor(blank_image,cv2.COLOR_BGR2GRAY)
-    
-##    lines = cv2.HoughLines(edges,1,np.pi/180,200)
-   
-##    for line in lines:
-##        for rho,theta in line:
-##            a = np.cos(theta)
-##            b = np.sin(theta)
-##            x0 = a*rho
-##            y0 = b*rho
-##            x1 = int(x0 + 1000*(-b))
-##            y1 = int(y0 + 1000*(a))
-##            x2 = int(x0 - 1000*(-b))
-##            y2 = int(y0 - 1000*(a))
-##
-##            cv2.line(line_img,(x1,y1),(x2,y2),(0,0,255),2)
+
     return (line_img, lines, merged_lines, blank_image)
 
 
@@ -197,15 +182,15 @@ def correct_skew(img, corners):
     return dst
 
 
-def get_page_corners(img):
+def get_page_corners(bin_img, img):
     params = { ## tested good values
-        "minLineLength": 4,
+        "minLineLength": 400000,
         "maxLineGap": 50,
         "threshold": 150,
         "blur": 7
         }
 
-    result, lines, merged_lines, bin_lines = get_lines(img, params = params)
+    result, lines, merged_lines, bin_lines = get_lines(bin_img, params = params)
 
 ##    bin_lines = cv2.bitwise_not(bin_lines)
 
@@ -226,13 +211,13 @@ def get_page_corners(img):
 ##
 ##    for line in lines:
 ##        print get_angle(line)
-##    
+    
 ##    plt.subplot(121), plt.imshow(img,cmap = 'gray')
 ##    plt.title('Original Image'), plt.xticks([]), plt.yticks([])
 ##    plt.subplot(122),plt.imshow(result,cmap = 'gray')
 ##    plt.title('Edge Image'), plt.xticks([]), plt.yticks([])    
 ##    plt.show()
-    
+##    
     height, width = img.shape[:2]
 ##
 ##    img_corners = [[0,0], [width, 0], [width, height], [0, height]]
@@ -275,87 +260,93 @@ def get_page_corners(img):
                 min_y = y2
 
     extremes = [min_x, min_y, max_x, max_y]
-    print extremes
     corners = [[min_x, min_y], [max_x, min_y], [max_x, max_y], [min_x, max_y]]
+##    print corners
     img = correct_skew(img, corners)
-    return img
+    bin_img = correct_skew(img, corners)
+    return bin_img, img
     
   
-##path = raw_input()
-##corners = raw_input()
+path = raw_input()
+corners = raw_input()
 
 
-path = 'pic_lib/1.jpg'
-path = 'pic_lib/straight1.jpg'
-##path = 'pic_lib/line_circ.jpg'
-##path = 'pic_lib/circ.jpg'
-##path = 'pic_lib/skewed.jpg'
-corners = 'None'
+##path = 'pic_lib/1.jpg'
+##path = 'pic_lib/straight1.jpg'
+####path = 'pic_lib/line_circ.jpg'
+####path = 'pic_lib/circ.jpg'
+####path = 'pic_lib/skewed.jpg'
+##corners = 'None'
 
 img = cv2.imread(path,0)
 if (img is not None):
     img = utils.shrink_to_size(img)
-    if (corners != 'None'):
-        img = correct_skew(img, eval(corners))
+    orig_img = img.copy()
 
-    ref_img = cv2.cvtColor(img,cv2.COLOR_GRAY2BGR)
-    
     img_bin = img.copy()
-##    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
-##    result = clahe.apply(img)
-##    result = cv2.medianBlur(result,5)
     img_bin = cv2.GaussianBlur(img_bin,(5,5),0)
     img_bin = cv2.adaptiveThreshold(img_bin,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,\
             cv2.THRESH_BINARY,11,2)
-####    result = get_edges(get_circles(result))
 
-##    params = {
-##        "minLineLength": 4,
-##        "maxLineGap": 50,
-##        "threshold": 150,
-##        "blur": 7
-##        }
+    
+    if (corners != 'None'):
+        img = correct_skew(img, eval(corners)) 
+    else:
+        bin_img, img = get_page_corners(img_bin, img)
 
-##    result, circles = get_circles(img_bin)#, ref_img = ref_img)
-##    result, lines, merged_line, bin_lines = get_lines(img_bin)#, params = params)#, ref_img = ref_img)
+    img_bin = img.copy()
+    img_bin = cv2.GaussianBlur(img_bin,(5,5),0)
+    img_bin = cv2.adaptiveThreshold(img_bin,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,\
+            cv2.THRESH_BINARY,11,2)
+
+##    print 1
+    ref_img = cv2.cvtColor(img,cv2.COLOR_GRAY2BGR)
+    
+    ####    result = get_edges(get_circles(result))
+
+    result, circles = get_circles(img_bin)#, ref_img = ref_img)
+##    print 2
+    result, lines, merged_line, bin_lines = get_lines(img_bin, ref_img = ref_img)
+##    print 3
 ##
-##    circles = processing.get_best_circles(circles, lines)
+    circles = processing.get_best_circles(circles, merged_line)
 ##
-##    for circle, got_circle, lines in circles:
-##        x = circle[0]
-##        y = circle[1]
-##        r = circle[2]
-##
-##        xc = int(got_circle[0])
-##        yc = int(got_circle[1])
-##        R = int(got_circle[2])
-##
-##        
+##    print 4
+    for circle, got_circle, used_lines in circles:
+        x = circle[0]
+        y = circle[1]
+        r = circle[2]
+
+        xc = int(got_circle[0])
+        yc = int(got_circle[1])
+        R = int(got_circle[2])
+
+        
 ##        # draw the outer circle
 ##        cv2.circle(img,(x,y),r,(0,255,0),2)
 ##        # draw the center of the circle
 ##        cv2.circle(img,(x,y),2,(0,0,255),3)
-##
-##        # draw the outer circle
-##        cv2.circle(img,(xc,yc),R,(0,255,0),2)
-##        # draw the center of the circle
-##        cv2.circle(img,(xc,yc),3,(0,0,255),3)
-##        
-##
-##        for line in lines:
+
+        # draw the outer circle
+        cv2.circle(result,(xc,yc),R,(0,255,0),2)
+        # draw the center of the circle
+        cv2.circle(result,(xc,yc),3,(0,0,255),3)
+        
+
+##        for line in used_lines:
 ##            for x1,y1,x2,y2 in line:
 ##                cv2.line(img,(x1,y1),(x2,y2),(0,255,0), 10)
-##
 
-    result = get_page_corners(img_bin)
+
+##    result = get_page_corners(img_bin)
 ##    result = get_corners(img_bin, ref_img = ref_img)
-##    utils.write_result(result = result)
+    utils.write_result(result = result)
 
-    plt.subplot(121), plt.imshow(img,cmap = 'gray')
-    plt.title('Original Image'), plt.xticks([]), plt.yticks([])
-    plt.subplot(122),plt.imshow(result,cmap = 'gray')
-    plt.title('Edge Image'), plt.xticks([]), plt.yticks([])    
-    plt.show()
+##    plt.subplot(121), plt.imshow(img,cmap = 'gray')
+##    plt.title('Original Image'), plt.xticks([]), plt.yticks([])
+##    plt.subplot(122),plt.imshow(result,cmap = 'gray')
+##    plt.title('Edge Image'), plt.xticks([]), plt.yticks([])    
+##    plt.show()
     
 ######  Or...
 ####    cv2.imshow('detected circles',result)

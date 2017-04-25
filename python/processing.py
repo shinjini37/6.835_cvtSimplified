@@ -3,7 +3,7 @@ import numpy as np
 import math
 
 def get_best_circles(circles, lines):
-    print len(circles[0])
+##    print len(circles[0])
     threshold_1 = 20
     threshold_2 = 50
     angle_thresh = math.radians(10)
@@ -26,7 +26,7 @@ def get_best_circles(circles, lines):
                     if (length< angle_thresh*r):
                         match_lines.append(line)
                         line_length += length
-        print match_lines
+##        print match_lines
         # do circle fit on points and check that the circle is good approx of given
         points = []
         for line in match_lines:
@@ -49,7 +49,7 @@ def get_best_circles(circles, lines):
 ##                print match_lines
             best_circles.append((circle, got_circle, match_lines))
 
-    print len(best_circles)
+##    print len(best_circles)
 ##    print best_circles
     return best_circles
             
