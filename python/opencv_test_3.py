@@ -4,7 +4,7 @@ from matplotlib import pyplot as plt
 import utility as utils
 import processing
 import math
-import general_merge as line_merge
+import line_merge
 
 def get_edges(img):
     edges = cv2.Canny(img,100,200)
