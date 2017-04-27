@@ -4,7 +4,7 @@ from matplotlib import pyplot as plt
 import utility as utils
 import processing
 import math
-import line_merge
+import general_merge as line_merge
 
 def get_edges(img):
     edges = cv2.Canny(img,100,200)
@@ -267,16 +267,16 @@ def get_page_corners(bin_img, img):
     return bin_img, img
     
   
-path = raw_input()
-corners = raw_input()
+##path = raw_input()
+##corners = raw_input()
 
 
 ##path = 'pic_lib/1.jpg'
-##path = 'pic_lib/straight1.jpg'
+path = 'pic_lib/straight1.jpg'
 ####path = 'pic_lib/line_circ.jpg'
 ##path = 'pic_lib/circ.jpg'
 ##path = 'pic_lib/skewed.jpg'
-##corners = 'None'
+corners = 'None'
 
 img = cv2.imread(path,0)
 if (img is not None):
@@ -342,11 +342,11 @@ if (img is not None):
 ##    result = get_corners(img_bin, ref_img = ref_img)
     utils.write_result(result = result)
 
-##    plt.subplot(121), plt.imshow(img,cmap = 'gray')
-##    plt.title('Original Image'), plt.xticks([]), plt.yticks([])
-##    plt.subplot(122),plt.imshow(result,cmap = 'gray')
-##    plt.title('Edge Image'), plt.xticks([]), plt.yticks([])    
-##    plt.show()
+    plt.subplot(121), plt.imshow(img,cmap = 'gray')
+    plt.title('Original Image'), plt.xticks([]), plt.yticks([])
+    plt.subplot(122),plt.imshow(result,cmap = 'gray')
+    plt.title('Edge Image'), plt.xticks([]), plt.yticks([])    
+    plt.show()
     
 ######  Or...
 ####    cv2.imshow('detected circles',result)
