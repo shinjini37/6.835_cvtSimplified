@@ -59,9 +59,9 @@ def clean_lines(match_lines_list, lines):
     
 def get_best_circles(circles, lines):
 ##    print len(circles[0])
-    line_dist_thresh = 20 #scale dependant but not dependant on r
+    line_dist_thresh = 20 #scale dependent but not dependent on r
     
-    angle_thresh = math.radians(30)
+##    angle_thresh = math.radians(30)
     residu_thresh = .20
     best_circles = []
     got_circles = []
@@ -81,12 +81,11 @@ def get_best_circles(circles, lines):
 
                 length = geometry.get_dist([x1, y1], [x2,y2])
                 if (diff1<line_dist_thresh and diff2<line_dist_thresh and diff3<line_dist_thresh):
-                    if (length< angle_thresh*r):
-                        match_lines.append(line)
-                        line_length += length
+##                    if (length< angle_thresh*r):
+                    match_lines.append(line)
+                    line_length += length
 ##        print match_lines
         # do circle fit on points and check that the circle is good approx of given
-        match_lines_list.append(match_lines)
         points = []
         for line in match_lines:
             for x1,y1,x2,y2 in line:
@@ -95,18 +94,21 @@ def get_best_circles(circles, lines):
 
         arc_length = 2*math.pi*r
         ratio = line_length/float(arc_length)
-        if ratio>.2 and ratio <2.2:
+        if ratio>.90:
             xc, yc, R, residu = circle_fit(points)
             got_circle = [xc, yc, R]
             diff_x = abs(xc-x)
             diff_y = abs(yc-y)
             diff_r = abs(R-r)
-##            print residu, R
-##            print residu/R
+            print match_lines
+            print residu, R
+            print residu/R
             
             if (residu<residu_thresh*R):
                 best_circles.append((circle, got_circle, match_lines))
                 got_circles.append(got_circle)
+                match_lines_list.append(match_lines)
+        
 
 ##    print len(got_circles)
 ##    print got_circles

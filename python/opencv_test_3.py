@@ -25,10 +25,12 @@ def get_circles(img, ref_img = None, help_lines = None):
 ##    inv_img = cv2.bitwise_not(img)    
 ##    cimg = cv2.medianBlur(img,1)
 ##    cimg = cv2.GaussianBlur(img,(5,5),0)
-
-    
-    circles = cv2.HoughCircles(cimg,cv2.HOUGH_GRADIENT,1,20,
-                                param1=50,param2=50,minRadius=0,maxRadius=0)
+    dp = 1
+    min_dist = 20
+    param1 = 50 # tested value
+    param2 = 40 # tested value
+    circles = cv2.HoughCircles(cimg,cv2.HOUGH_GRADIENT, dp, min_dist,
+                                param1=param1,param2=param2,minRadius=0,maxRadius=0)
     if (circles is None):
         circles = [[]]
     circles = np.uint16(np.around(circles))
@@ -120,16 +122,10 @@ def get_lines(img, ref_img = None, params = None):
         for x1,y1,x2,y2 in line:
             cv2.line(line_img,(x1,y1),(x2,y2),(0,255,0), 3)
 ##            cv2.line(blank_image,(x1,y1),(x2,y2),(0,0,0), 1)
-
-    merged_lines = line_merge.merge_lines(lines)
-##    for line in merged_lines:
-##        for x1,y1,x2,y2 in line:
-##            cv2.line(line_img,(x1,y1),(x2,y2),(255,255,0), 3)
-    
     
     blank_image = cv2.cvtColor(blank_image,cv2.COLOR_BGR2GRAY)
 
-    return (line_img, lines, merged_lines, blank_image)
+    return (line_img, lines, blank_image)
 
 
 
@@ -236,8 +232,8 @@ def get_page_corners(bin_img, img):
         "blur": 7
         }
 
-    result, lines, merged_lines, bin_lines = get_lines(bin_img, params = params)
-
+    result, lines, bin_lines = get_lines(bin_img, params = params)
+    merged_lines = line_merge.merge_lines(lines)
 ##    bin_lines = cv2.bitwise_not(bin_lines)
 
 ##    params = {
@@ -322,8 +318,8 @@ def get_page_corners(bin_img, img):
 
 
 path = 'pic_lib/1.jpg'
-path = 'pic_lib/straight1.jpg'
-path = 'pic_lib/line_circ.jpg'
+##path = 'pic_lib/straight1.jpg'
+##path = 'pic_lib/line_circ.jpg'
 ##path = 'pic_lib/circ.jpg'
 ##path = 'pic_lib/blur_tri.jpg'
 ##path = 'pic_lib/tri.jpg'
@@ -359,24 +355,17 @@ if (img is not None):
 
     result = ref_img
     
-    result, lines, merged_lines, bin_lines = get_lines(img_bin, ref_img = ref_img)
+    result, lines, bin_lines = get_lines(img_bin, ref_img = ref_img)
 
 
 
-    print merged_lines
-##    for line1 in merged_lines:
-##        for line2 in merged_lines:
-##            dist = geometry.get_min_dist_line_segments(line1, line2)
-##            print line1
-##            print line2
-##            print dist
-##            print geometry.get_angle(line1), geometry.get_angle(line2)
+    result, circles, cleaned_lines = get_circles(img_bin, help_lines = lines, ref_img = ref_img)
+    merged_lines = line_merge.merge_lines(cleaned_lines)
     
-    result, circles, cleaned_lines = get_circles(img_bin, help_lines = merged_lines, ref_img = ref_img)
-    merged_lines = cleaned_lines
+##    merged_lines = cleaned_lines
     for line in merged_lines:
         for x1,y1,x2,y2 in line:
-            cv2.line(result,(x1,y1),(x2,y2),(255,255,0), 10)
+            cv2.line(result,(x1,y1),(x2,y2),(255,255,0), 5)
     print merged_lines
     print len(merged_lines)
  

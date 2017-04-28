@@ -45,7 +45,7 @@ def get_merged_line(lines):
 
 def check_line_merge_criteria(ref_line, test_line):
     angle_thresh = 5
-    dist_thresh = 15
+    dist_thresh = 20
     min_length = 5
     
     merge = False
