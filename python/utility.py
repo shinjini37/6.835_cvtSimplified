@@ -27,7 +27,7 @@ def write_result(image=None, result=None):
     if (image is not None):
         cv2.imwrite('./public/images/image.png', image)
     if (result is not None):
-        cv2.imwrite('./public/images/test.png', result)
+        cv2.imwrite('./public/images/result.png', result)
     
 def shrink_to_size(img, get_dims = False):
     height, width = img.shape[:2]
