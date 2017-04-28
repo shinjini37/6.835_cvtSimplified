@@ -1,5 +1,7 @@
 import cv2
 
+from datetime import datetime
+
 def to_JSON_string(obj):
     string = ""
     if isinstance(obj, dict):
@@ -23,11 +25,15 @@ def send(obj):
     print(to_JSON_string(obj))
 
 
-def write_result(image=None, result=None):
+def write_result(image=None, result=None, save_copy=False):
     if (image is not None):
         cv2.imwrite('./public/images/image.png', image)
     if (result is not None):
         cv2.imwrite('./public/images/result.png', result)
+        if save_copy:
+            filename = './python/tests/'+datetime.now().strftime('%Y-%m-%d-%H-%M-%S')+'.png'
+            cv2.imwrite(filename, result)
+        
     
 def shrink_to_size(img, get_dims = False):
     height, width = img.shape[:2]
@@ -59,4 +65,4 @@ def shrink_to_size(img, get_dims = False):
     if get_dims:
         return (img, width, height)
     return img
-  
+

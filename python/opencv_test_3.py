@@ -312,9 +312,13 @@ def get_page_corners(bin_img, img):
     img, corners, orientation = correct_skew(img, corners)
     bin_img, corners, orientation = correct_skew(img, corners)
     return bin_img, img, corners
-    
-##testing = True;
-testing = False;
+
+
+save_pics = True
+##save_pics = False
+
+testing = True
+testing = False
 
 if not testing:
     path = raw_input()
@@ -346,7 +350,7 @@ if (img is not None):
 
     
     if (corners != 'None'):
-        img = correct_skew(img, eval(corners))
+        img, corners, orientation = correct_skew(img, eval(corners))
     else:
         bin_img, img, corners = get_page_corners(img_bin, img)
 
@@ -382,7 +386,7 @@ if (img is not None):
 
 ##    result = get_page_corners(img_bin)
 ##    result = get_corners(img_bin, ref_img = ref_img)
-    utils.write_result(result = result)
+    utils.write_result(result = result, save_copy=save_pics)
 
 ##    plt.subplot(121), plt.imshow(orig_img,cmap = 'gray')
 ##    plt.title('Original Image'), plt.xticks([]), plt.yticks([])
