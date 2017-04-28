@@ -4,6 +4,9 @@ import random
 def merge_helper(lines, merge_group, check_merge_criteria):
     merged_lines = []
 
+    if (len(lines) == 0):
+        return []
+    
     remaining_lines = lines[:]
     
     seed_idx = 0 #random.choice(range(len(lines)))
