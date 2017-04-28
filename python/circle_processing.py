@@ -100,9 +100,9 @@ def get_best_circles(circles, lines):
             diff_x = abs(xc-x)
             diff_y = abs(yc-y)
             diff_r = abs(R-r)
-            print match_lines
-            print residu, R
-            print residu/R
+##            print match_lines
+##            print residu, R
+##            print residu/R
             
             if (residu<residu_thresh*R):
                 best_circles.append((circle, got_circle, match_lines))
@@ -114,7 +114,7 @@ def get_best_circles(circles, lines):
 ##    print got_circles
     got_circles = general_merge.merge(got_circles, get_merged_circle, check_circle_merge_criteria)
 ##    print len(got_circles)
-    print got_circles
+##    print got_circles
     
 ##    print len(best_circles)
 ##    print best_circles

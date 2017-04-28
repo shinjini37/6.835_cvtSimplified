@@ -45,11 +45,11 @@ def get_circles(img, ref_img = None, help_lines = None):
 ##            cv2.circle(ref_img,(x,y),2,(0,0,255),3)
 
     if (help_lines is not None):
-        circles, cleaned_lines, debug_stuff = circle_processing.get_best_circles(circles, help_lines)
+        got_circles, cleaned_lines, debug_stuff = circle_processing.get_best_circles(circles, help_lines)
 
 
     ##    for circle, got_circle, used_lines in debug_stuff:
-    for got_circle in circles:
+    for got_circle in got_circles:
     
 ##        x = circle[0]
 ##        y = circle[1]
@@ -80,7 +80,7 @@ def get_circles(img, ref_img = None, help_lines = None):
 ##            cv2.line(ref_img,(x1,y1),(x2,y2),(255,255,0), 1)
 ##    
 
-    return (ref_img, circles, cleaned_lines)
+    return (ref_img, got_circles, cleaned_lines)
 
 
 
@@ -221,7 +221,8 @@ def correct_skew(img, corners):
 
     dst = cv2.warpPerspective(img,M,(corrected_corners[2][0], corrected_corners[2][1]))
 
-    return dst
+    # returns the ordered corners
+    return dst, corners, orientation
 
 
 def get_page_corners(bin_img, img):
@@ -308,27 +309,30 @@ def get_page_corners(bin_img, img):
 ##    extremes = [min_x, min_y, max_x, max_y]
 ##    corners = [[min_x, min_y], [max_x, min_y], [max_x, max_y], [min_x, max_y]]
 ##    print corners
-    img = correct_skew(img, corners)
-    bin_img = correct_skew(img, corners)
-    return bin_img, img
+    img, corners, orientation = correct_skew(img, corners)
+    bin_img, corners, orientation = correct_skew(img, corners)
+    return bin_img, img, corners
     
-  
-##path = raw_input()
-##corners = raw_input()
+##testing = True;
+testing = False;
 
+if not testing:
+    path = raw_input()
+    corners = raw_input()
 
-path = 'pic_lib/1.jpg'
-##path = 'pic_lib/straight1.jpg'
-##path = 'pic_lib/line_circ.jpg'
-##path = 'pic_lib/circ.jpg'
-##path = 'pic_lib/blur_tri.jpg'
-##path = 'pic_lib/tri.jpg'
-##path = 'pic_lib/skewed.jpg'
-##path = 'pic_lib/test1.jpg'
-##path = 'pic_lib/test2.jpg'
-##path = 'pic_lib/test3.jpg'
+else:
+    path = 'pic_lib/1.jpg'
+    ##path = 'pic_lib/straight1.jpg'
+    ##path = 'pic_lib/line_circ.jpg'
+    ##path = 'pic_lib/circ.jpg'
+    ##path = 'pic_lib/blur_tri.jpg'
+    ##path = 'pic_lib/tri.jpg'
+    ##path = 'pic_lib/skewed.jpg'
+    ##path = 'pic_lib/test1.jpg'
+    ##path = 'pic_lib/test2.jpg'
+    ##path = 'pic_lib/test3.jpg'
 
-corners = 'None'
+    corners = 'None'
 
 img = cv2.imread(path,0)
 if (img is not None):
@@ -342,9 +346,11 @@ if (img is not None):
 
     
     if (corners != 'None'):
-        img = correct_skew(img, eval(corners)) 
+        img = correct_skew(img, eval(corners))
     else:
-        bin_img, img = get_page_corners(img_bin, img)
+        bin_img, img, corners = get_page_corners(img_bin, img)
+
+    print corners
 
     img_bin = img.copy()
     img_bin = cv2.GaussianBlur(img_bin,(5,5),0)
@@ -361,26 +367,28 @@ if (img is not None):
 
     result, circles, cleaned_lines = get_circles(img_bin, help_lines = lines, ref_img = ref_img)
     merged_lines = line_merge.merge_lines(cleaned_lines)
-    
+
+    return_lines = []
 ##    merged_lines = cleaned_lines
     for line in merged_lines:
         for x1,y1,x2,y2 in line:
             cv2.line(result,(x1,y1),(x2,y2),(255,255,0), 5)
-    print merged_lines
-    print len(merged_lines)
- 
-
-
+            return_lines.append([[x1,y1],[x2,y2]])
+##    print merged_lines
+##    print len(merged_lines)
+    
+    print return_lines
+    print circles
 
 ##    result = get_page_corners(img_bin)
 ##    result = get_corners(img_bin, ref_img = ref_img)
     utils.write_result(result = result)
 
-    plt.subplot(121), plt.imshow(orig_img,cmap = 'gray')
-    plt.title('Original Image'), plt.xticks([]), plt.yticks([])
-    plt.subplot(122),plt.imshow(result,cmap = 'gray')
-    plt.title('Edge Image'), plt.xticks([]), plt.yticks([])    
-    plt.show()
+##    plt.subplot(121), plt.imshow(orig_img,cmap = 'gray')
+##    plt.title('Original Image'), plt.xticks([]), plt.yticks([])
+##    plt.subplot(122),plt.imshow(result,cmap = 'gray')
+##    plt.title('Edge Image'), plt.xticks([]), plt.yticks([])    
+##    plt.show()
 ##    
 ######  Or...
 ####    cv2.imshow('detected circles',result)
