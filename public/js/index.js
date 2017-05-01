@@ -174,18 +174,18 @@ $(document).ready(function() {
     //     }
     // });
 
-    $.ajax({
-        url: '/test',
-        data: {},
-        type: 'POST',
-        success: function (res) {
-            // console.log(res);
-            if (JSON.parse(res.success)){
-                //$('#image-holder').html('<img src="http://localhost:3000/images/test.png" />');
-                console.log(res.messages);
-            }
-        }
-    });
+    //$.ajax({
+    //    url: '/test',
+    //    data: {},
+    //    type: 'POST',
+    //    success: function (res) {
+    //        // console.log(res);
+    //        if (JSON.parse(res.success)){
+    //            //$('#image-holder').html('<img src="http://localhost:3000/images/test.png" />');
+    //            console.log(res.messages);
+    //        }
+    //    }
+    //});
 
 });
 

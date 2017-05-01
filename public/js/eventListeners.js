@@ -7,21 +7,39 @@ var imgCss = {};
 
 $(document).ready(function(){
     var inputCanvas = InputCanvas($('#input-canvas'));
+    var resultCanvas = InputCanvas($('#result-canvas'));
 
     var updateCorners = function(corners){
         console.log(corners);
         var cornerListElt = $("#corners");
         cornerListElt.html('');
         corners.forEach(function(xy){
+            console.log(xy);
             var elt = $('<li>');
             elt.addClass('corner');
             elt.text('x: '+xy[0]+', y: '+xy[1]);
             cornerListElt.append(elt);
         });
+        inputCanvas.clear();
         inputCanvas.drawPoints(corners);
 
     };
 
+    var processMessages = function(messages){
+        var corners = messages[0];
+        var lines = messages[1];
+        var circles = messages[2];
+        console.log(corners);
+
+        corners.forEach(function(corner){
+            skew.updatePoints(corner, true);
+        });
+        updateCorners(skew.getAppScalePoints());
+        var ratio = skew.getRatio();
+        //resultCanvas.clear();
+        //resultCanvas.drawLines(lines, ratio);
+        //resultCanvas.drawCircles(circles, ratio);
+    };
 
     var refreshImage = function(ratio, width, height){
         if (ratio){
@@ -29,6 +47,7 @@ $(document).ready(function(){
         }
         skew.resetCorners(width, height);
         inputCanvas.updateCanvasDimensions(width, height);
+        resultCanvas.updateCanvasDimensions(width, height);
         updateCorners(skew.getAppScalePoints());
         $('#image-holder img').unbind().click(function(e){
             var image = $(this);
@@ -53,6 +72,9 @@ $(document).ready(function(){
             //Ajax events
             success: function (res) {
                 if (JSON.parse(res.success)){
+                    var messages = res.messages;
+                    processMessages(messages);
+
                     var result = $('<img>');
                     result.attr('src', "http://localhost:3000/images/result.png?timestamp=" + new Date().getTime());
                     result.css(imgCss);
@@ -73,7 +95,8 @@ $(document).ready(function(){
         if (file){
             $('#image-holder img').remove();
             $('#result-holder img').remove();
-
+            inputCanvas.clear();
+            resultCanvas.clear();
             var formData = new FormData();
             formData.append('file', file);
             $.ajax({
@@ -103,6 +126,8 @@ $(document).ready(function(){
                             type: 'GET',
                             success: function (res) {
                                 if (JSON.parse(res.success)) {
+                                    var messages = res.messages;
+                                    processMessages(messages);
                                     var result = $('<img>');
                                     result.attr('src', "http://localhost:3000/images/result.png?timestamp=" + new Date().getTime());
                                     result.css(imgCss);

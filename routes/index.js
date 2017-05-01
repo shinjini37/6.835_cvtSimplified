@@ -132,7 +132,7 @@ router.post('/corners', function(req, res, next) {
     var makeOnMessageFunction = function(messages){
         var onMessage = function(message){
             console.log(message);
-            // message = JSON.parse(message.trim());
+            message = JSON.parse(message.trim());
             messages.push(message);
         };
         return onMessage

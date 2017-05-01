@@ -267,6 +267,8 @@ def get_page_corners(bin_img, img):
 
     img_corners = [[0,0], [width, 0], [width, height], [0, height]]
     corners = []
+
+    print merged_lines
     
     for img_corner in img_corners:
         min_dist = float('inf')
@@ -279,7 +281,9 @@ def get_page_corners(bin_img, img):
             if (dist<min_dist):
                 min_dist = dist
                 best_corner = intersect
-        corners.append(best_corner)
+        if best_corner is not None:
+            corners.append(best_corner)
+    
 ####    
 ##    max_x = 0
 ##    max_y = 0
@@ -309,8 +313,11 @@ def get_page_corners(bin_img, img):
 ##    extremes = [min_x, min_y, max_x, max_y]
 ##    corners = [[min_x, min_y], [max_x, min_y], [max_x, max_y], [min_x, max_y]]
 ##    print corners
-    img, corners, orientation = correct_skew(img, corners)
-    bin_img, corners, orientation = correct_skew(img, corners)
+    if len(corners)>0:    
+        img, corners, orientation = correct_skew(img, corners)
+        bin_img, corners, orientation = correct_skew(bin_img, corners)
+    else:
+        corners = img_corners
     return bin_img, img, corners
 
 
@@ -326,6 +333,7 @@ if not testing:
 
 else:
     path = 'pic_lib/1.jpg'
+    path = 'pic_lib/test_s1.jpg'
     ##path = 'pic_lib/straight1.jpg'
     ##path = 'pic_lib/line_circ.jpg'
     ##path = 'pic_lib/circ.jpg'
