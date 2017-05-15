@@ -3,21 +3,12 @@ import numpy as np
 from matplotlib import pyplot as plt
 import utility as utils
 import circle_processing
-import math
 import line_merge
 import geometry
 
-def get_edges(img):
-    edges = cv2.Canny(img,100,200)
-##    edges = cv2.cvtColor(edges,cv2.COLOR_GRAY2BGR)
-    return edges
 
-
-
-
-
-def get_circles(img, ref_img = None, help_lines = None):
-    if (ref_img is None):
+def get_circles(img, ref_img=None, help_lines=None):
+    if ref_img is None:
         ref_img = cv2.cvtColor(img,cv2.COLOR_GRAY2BGR)
     height, width = img.shape[:2]
     
@@ -28,12 +19,16 @@ def get_circles(img, ref_img = None, help_lines = None):
     dp = 1
     min_dist = 20
     param1 = 50 # tested value
-    param2 = 40 # tested value
-    circles = cv2.HoughCircles(cimg,cv2.HOUGH_GRADIENT, dp, min_dist,
+##    param2 = 40 # tested value
+    param2 = 20
+    
+    hough_circles = cv2.HoughCircles(cimg,cv2.HOUGH_GRADIENT, dp, min_dist,
                                 param1=param1,param2=param2,minRadius=0,maxRadius=0)
-    if (circles is None):
-        circles = [[]]
-    circles = np.uint16(np.around(circles))
+
+    if hough_circles is None:
+        hough_circles = [[]]
+    hough_circles = np.uint16(np.around(hough_circles))
+    circles = hough_circles
 ##    for circle in circles[0]:
 ##        x = circle[0]
 ##        y = circle[1]
@@ -44,12 +39,20 @@ def get_circles(img, ref_img = None, help_lines = None):
 ##            # draw the center of the circle
 ##            cv2.circle(ref_img,(x,y),2,(0,0,255),3)
 
-    if (help_lines is not None):
-        got_circles, cleaned_lines, debug_stuff = circle_processing.get_best_circles(circles, help_lines)
+##    if testing:
+##        plt.subplot(121), plt.imshow(img,cmap = 'gray')
+##        plt.title('Original Image'), plt.xticks([]), plt.yticks([])
+##        plt.subplot(122),plt.imshow(cimg,cmap = 'gray')
+##        plt.title('Edge Image'), plt.xticks([]), plt.yticks([])    
+##        plt.show()
+##        print "circles", circles
 
+    if help_lines is not None:
+        circles, cleaned_lines, debug_stuff = circle_processing.get_best_circles(circles, help_lines)
+        print debug_stuff
 
     ##    for circle, got_circle, used_lines in debug_stuff:
-    for got_circle in got_circles:
+    for got_circle in circles:
     
 ##        x = circle[0]
 ##        y = circle[1]
@@ -80,7 +83,7 @@ def get_circles(img, ref_img = None, help_lines = None):
 ##            cv2.line(ref_img,(x1,y1),(x2,y2),(255,255,0), 1)
 ##    
 
-    return (ref_img, got_circles, cleaned_lines)
+    return ref_img, circles, cleaned_lines
 
 
 
@@ -131,18 +134,18 @@ def get_lines(img, ref_img = None, params = None):
 
 
 
-def get_corners(img, ref_img = None):
-    if (ref_img is None):
+def get_corners(img, ref_img=None):
+    if ref_img is None:
         ref_img = cv2.cvtColor(img,cv2.COLOR_GRAY2BGR)
     corner_img = ref_img
     
     corners = cv2.goodFeaturesToTrack(img,25,0.1,100)
-    if (corners is not None):
+    if corners is not None:
         corners = np.int0(corners)
 
         for i in corners:
-            x,y = i.ravel()
-            cv2.circle(corner_img,(x,y),3,255,-1)
+            x, y = i.ravel()
+            cv2.circle(corner_img, (x, y), 3, 255, -1)
     return corner_img
 
 
@@ -230,7 +233,7 @@ def get_page_corners(bin_img, img):
         "minLineLength": 400000,
         "maxLineGap": 50,
         "threshold": 150,
-        "blur": 7
+        "blur": 5
         }
 
     result, lines, bin_lines = get_lines(bin_img, params = params)
@@ -268,8 +271,6 @@ def get_page_corners(bin_img, img):
     img_corners = [[0,0], [width, 0], [width, height], [0, height]]
     corners = []
 
-    print merged_lines
-    
     for img_corner in img_corners:
         min_dist = float('inf')
         best_corner = None
@@ -325,7 +326,7 @@ save_pics = True
 ##save_pics = False
 
 testing = True
-testing = False
+##testing = False
 
 if not testing:
     path = raw_input()
@@ -334,6 +335,9 @@ if not testing:
 else:
     path = 'pic_lib/1.jpg'
     path = 'pic_lib/test_s1.jpg'
+    path = 'pic_lib/lor_1.jpg'
+    path = 'pic_lib/huy_1.jpg'
+    
     ##path = 'pic_lib/straight1.jpg'
     ##path = 'pic_lib/line_circ.jpg'
     ##path = 'pic_lib/circ.jpg'
@@ -394,14 +398,16 @@ if (img is not None):
 
 ##    result = get_page_corners(img_bin)
 ##    result = get_corners(img_bin, ref_img = ref_img)
-    utils.write_result(result = result, save_copy=save_pics)
 
-##    plt.subplot(121), plt.imshow(orig_img,cmap = 'gray')
-##    plt.title('Original Image'), plt.xticks([]), plt.yticks([])
-##    plt.subplot(122),plt.imshow(result,cmap = 'gray')
-##    plt.title('Edge Image'), plt.xticks([]), plt.yticks([])    
-##    plt.show()
-##    
+    if not testing:
+        utils.write_result(result = result, save_copy=save_pics)
+    else:
+        plt.subplot(121), plt.imshow(orig_img,cmap = 'gray')
+        plt.title('Original Image'), plt.xticks([]), plt.yticks([])
+        plt.subplot(122),plt.imshow(result,cmap = 'gray')
+        plt.title('Edge Image'), plt.xticks([]), plt.yticks([])    
+        plt.show()
+    
 ######  Or...
 ####    cv2.imshow('detected circles',result)
 ####    cv2.waitKey(0)

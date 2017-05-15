@@ -53,7 +53,7 @@ def check_line_merge_criteria(ref_line, test_line):
     length = geometry.get_dist(test_line[0][:2], test_line[0][2:])
     
     diff = geometry.get_angle_diff(ref_line, test_line)
-    if ((diff < angle_thresh) or (length<min_length)):
+    if ((diff < angle_thresh)):# or (length<min_length)):
         dist = geometry.get_min_dist_line_segments(ref_line, test_line)
         if (dist<dist_thresh):
             merge = True
