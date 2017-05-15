@@ -40,17 +40,25 @@ def get_circles(img, ref_img=None, help_lines=None):
 ##            cv2.circle(ref_img,(x,y),2,(0,0,255),3)
 
 ##    if testing:
+##        print "circles", circles
+##        for got_circle in circles[0]:
+##            xc = int(got_circle[0])
+##            yc = int(got_circle[1])
+##            R = int(got_circle[2])
+##
+##            # draw the outer circle
+##            cv2.circle(cimg,(xc,yc),R,(0,190,255),2)
+##            # draw the center of the circle
+##            cv2.circle(cimg,(xc,yc),3,(255,255,0),3)
 ##        plt.subplot(121), plt.imshow(img,cmap = 'gray')
 ##        plt.title('Original Image'), plt.xticks([]), plt.yticks([])
 ##        plt.subplot(122),plt.imshow(cimg,cmap = 'gray')
 ##        plt.title('Edge Image'), plt.xticks([]), plt.yticks([])    
 ##        plt.show()
-##        print "circles", circles
-
+        
     if help_lines is not None:
-        circles, cleaned_lines, debug_stuff = circle_processing.get_best_circles(circles, help_lines)
-        print debug_stuff
-
+        circles, cleaned_lines, orig_circles = circle_processing.get_best_circles(circles, help_lines)
+        
     ##    for circle, got_circle, used_lines in debug_stuff:
     for got_circle in circles:
     
@@ -72,6 +80,17 @@ def get_circles(img, ref_img=None, help_lines=None):
         cv2.circle(ref_img,(xc,yc),R,(255,0,255),2)
         # draw the center of the circle
         cv2.circle(ref_img,(xc,yc),3,(0,0,255),3)
+
+##    for got_circle in orig_circles:
+##    
+##        xc = int(got_circle[0])
+##        yc = int(got_circle[1])
+##        R = int(got_circle[2])
+##
+##        # draw the outer circle
+##        cv2.circle(ref_img,(xc,yc),R,(0,190,255),2)
+##        # draw the center of the circle
+##        cv2.circle(ref_img,(xc,yc),3,(255,255,0),3)
         
 
 ##        for line in used_lines:
@@ -276,14 +295,18 @@ def get_page_corners(bin_img, img):
         best_corner = None
 ##        print "image corner", img_corner
         for line in merged_lines:
-            dist, intersect = geometry.dist_from_point_to_line_segment(img_corner, line)
-##            print line
-##            print dist, intersect
-            if (dist<min_dist):
-                min_dist = dist
-                best_corner = intersect
+            if geometry.get_line_length(line)>min(height/8.0, width/8.0):
+                dist, intersect = geometry.dist_from_point_to_line_segment(img_corner, line)
+    ##            print line
+    ##            print dist, intersect
+                if (dist<min_dist):
+                    min_dist = dist
+                    best_corner = intersect
         if best_corner is not None:
-            corners.append(best_corner)
+            if (min_dist>max(height/2.0, width/2.0)): #hackityhack
+                corners.append(img_corner)
+            else:
+                corners.append(best_corner)
     
 ####    
 ##    max_x = 0
@@ -333,15 +356,18 @@ if not testing:
     corners = raw_input()
 
 else:
-    path = 'pic_lib/1.jpg'
-    path = 'pic_lib/test_s1.jpg'
+##    path = 'pic_lib/1.jpg'
     path = 'pic_lib/lor_1.jpg'
     path = 'pic_lib/huy_1.jpg'
+##    path = 'pic_lib/huy_2.jpg'
+    path = 'pic_lib/sou_1.jpg'
+    path = 'pic_lib/jul_1.jpg'
+##    path = 'pic_lib/jul_2.jpg'
     
-    ##path = 'pic_lib/straight1.jpg'
-    ##path = 'pic_lib/line_circ.jpg'
-    ##path = 'pic_lib/circ.jpg'
-    ##path = 'pic_lib/blur_tri.jpg'
+    path = 'pic_lib/straight1.jpg'
+##    path = 'pic_lib/line_circ.jpg'
+##    path = 'pic_lib/circ.jpg'
+##    path = 'pic_lib/blur_tri.jpg'
     ##path = 'pic_lib/tri.jpg'
     ##path = 'pic_lib/skewed.jpg'
     ##path = 'pic_lib/test1.jpg'

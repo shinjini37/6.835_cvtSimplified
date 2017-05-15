@@ -43,23 +43,44 @@ def get_merged_line(lines):
 ##    return [[end1[0], end1[1], end2[0], end2[1]]]
     return [[max_max_point1[0], max_max_point1[1], max_max_point2[0], max_max_point2[1]]]
 
+
 def check_line_merge_criteria(ref_line, test_line):
+    
     angle_thresh = 5
     dist_thresh = 20
-    min_length = 5
-    
+
     merge = False
 
     length = geometry.get_dist(test_line[0][:2], test_line[0][2:])
     
     diff = geometry.get_angle_diff(ref_line, test_line)
-    if ((diff < angle_thresh)):# or (length<min_length)):
+    if (diff < angle_thresh):
         dist = geometry.get_min_dist_line_segments(ref_line, test_line)
         if (dist<dist_thresh):
             merge = True
     return merge
 
-def merge_lines(lines):
+def check_line_merge_criteria_circ(ref_line, test_line):
+
+    angle_thresh = 1
+    dist_thresh = 5
+
+    merge = False
+
+    length = geometry.get_dist(test_line[0][:2], test_line[0][2:])
+    
+    diff = geometry.get_angle_diff(ref_line, test_line)
+    if (diff < angle_thresh):
+        dist = geometry.get_min_dist_line_segments(ref_line, test_line)
+        if (dist<dist_thresh):
+            merge = True
+    return merge
+
+
+
+def merge_lines(lines, circle = False):
+    if circle:
+        return general_merge.merge(lines, get_merged_line, check_line_merge_criteria_circ)    
     return general_merge.merge(lines, get_merged_line, check_line_merge_criteria)
 
 ##test = [[[406, 536, 419, 283]],

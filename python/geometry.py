@@ -164,6 +164,10 @@ def get_endpoints(line):
     x1,y1,x2,y2 = line[0]
     return ([x1, y1], [x2, y2])
 
+def get_line_length(line):
+    x1,y1,x2,y2 = line[0]
+    return get_dist([x1,y1],[x2,y2])
+
 def get_midpoint(line):
     x1,y1,x2,y2 = line[0]
     return [(x1+x2)/2.0, (y1+y2)/2.0]
