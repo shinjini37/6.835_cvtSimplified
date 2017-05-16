@@ -77,9 +77,9 @@ def get_circles(img, ref_img=None, help_lines=None):
 ##        cv2.circle(img,(x,y),2,(0,0,255),3)
 
         # draw the outer circle
-        cv2.circle(ref_img,(xc,yc),R,(255,0,255),2)
+        cv2.circle(ref_img,(xc,yc),R,(255,0,255),1)
         # draw the center of the circle
-        cv2.circle(ref_img,(xc,yc),3,(0,0,255),3)
+        cv2.circle(ref_img,(xc,yc),3,(0,0,255),2)
 
 ##    for got_circle in orig_circles:
 ##    
@@ -142,7 +142,7 @@ def get_lines(img, ref_img = None, params = None):
 ##    print len(lines)
     for line in lines:
         for x1,y1,x2,y2 in line:
-            cv2.line(line_img,(x1,y1),(x2,y2),(0,255,0), 3)
+            cv2.line(line_img,(x1,y1),(x2,y2),(0,255,0), 1)
 ##            cv2.line(blank_image,(x1,y1),(x2,y2),(0,0,0), 1)
     
     blank_image = cv2.cvtColor(blank_image,cv2.COLOR_BGR2GRAY)
@@ -229,13 +229,17 @@ def correct_skew(img, corners):
         if max(height1, height2)>=max(width1, width2):            
             corrected_corners = corrected_corners_portrait
             orientation = 'portrait'
+            edge_lines = [[[0,0,0,550]], [[0,0,425,0]], [[0,550,425,550]], [[425,0,425, 550]]]
+
         else:
             corrected_corners = corrected_corners_landscape
             orientation = 'landscape'
-        return (corrected_corners, orientation)
+            edge_lines = [[[0,0,550,0]], [[0,0,0,425]], [[550,0, 550, 425]], [[0, 425, 550, 425]]]
+
+        return corrected_corners, orientation, edge_lines
 
     corners = order_corners(corners)
-    corrected_corners, orientation = get_corrected_corners(corners)
+    corrected_corners, orientation, edge_lines = get_corrected_corners(corners)
     pts1 = np.float32([corners])
     pts2 = np.float32([corrected_corners])
 
@@ -244,7 +248,7 @@ def correct_skew(img, corners):
     dst = cv2.warpPerspective(img,M,(corrected_corners[2][0], corrected_corners[2][1]))
 
     # returns the ordered corners
-    return dst, corners, orientation
+    return dst, corners, orientation, edge_lines
 
 
 def get_page_corners(bin_img, img):
@@ -288,6 +292,8 @@ def get_page_corners(bin_img, img):
 ##    print merged_lines
 
     img_corners = [[0,0], [width, 0], [width, height], [0, height]]
+    edge_lines = []#[[[0,0,width, 0]],[[0,0,0,height]],[[width,0,width,height]],[[0,height,width,height]]]
+    
     corners = []
 
     for img_corner in img_corners:
@@ -337,12 +343,13 @@ def get_page_corners(bin_img, img):
 ##    extremes = [min_x, min_y, max_x, max_y]
 ##    corners = [[min_x, min_y], [max_x, min_y], [max_x, max_y], [min_x, max_y]]
 ##    print corners
-    if len(corners)>0:    
-        img, corners, orientation = correct_skew(img, corners)
-        bin_img, corners, orientation = correct_skew(bin_img, corners)
-    else:
+    if len(corners)==0:    
         corners = img_corners
-    return bin_img, img, corners
+    
+    img, corners, orientation, edge_lines = correct_skew(img, corners)
+    bin_img, corners, orientation, edge_lines = correct_skew(bin_img, corners)
+        
+    return bin_img, img, corners, edge_lines
 
 
 save_pics = True
@@ -358,21 +365,27 @@ if not testing:
 else:
 ##    path = 'pic_lib/1.jpg'
     path = 'pic_lib/lor_1.jpg'
-    path = 'pic_lib/huy_1.jpg'
+##    path = 'pic_lib/huy_1.jpg'
 ##    path = 'pic_lib/huy_2.jpg'
-    path = 'pic_lib/sou_1.jpg'
-    path = 'pic_lib/jul_1.jpg'
-##    path = 'pic_lib/jul_2.jpg'
-    
-    path = 'pic_lib/straight1.jpg'
+##    path = 'pic_lib/sou_1.jpg'
+##    path = 'pic_lib/jul_1.jpg'
+    path = 'pic_lib/jul_2.jpg'
+##    path = 'pic_lib/shin_5.jpg'
+##    path = 'pic_lib/shin_4.jpg'
+##    path = 'pic_lib/shin_3.jpg'
+##    path = 'pic_lib/shin_2.jpg'
+##    path = 'pic_lib/shin_1.jpg'
+    path = 'pic_lib/eri_1.jpg'
+##    
+##    path = 'pic_lib/straight1.jpg'
 ##    path = 'pic_lib/line_circ.jpg'
 ##    path = 'pic_lib/circ.jpg'
 ##    path = 'pic_lib/blur_tri.jpg'
-    ##path = 'pic_lib/tri.jpg'
-    ##path = 'pic_lib/skewed.jpg'
-    ##path = 'pic_lib/test1.jpg'
-    ##path = 'pic_lib/test2.jpg'
-    ##path = 'pic_lib/test3.jpg'
+##    path = 'pic_lib/tri.jpg'
+##    path = 'pic_lib/skewed.jpg'
+##    path = 'pic_lib/test1.jpg'
+##    path = 'pic_lib/test2.jpg'
+##    path = 'pic_lib/test3.jpg'
 
     corners = 'None'
 
@@ -386,11 +399,11 @@ if (img is not None):
     img_bin = cv2.adaptiveThreshold(img_bin,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,\
             cv2.THRESH_BINARY,11,2)
 
-    
+    edge_lines = []
     if (corners != 'None'):
-        img, corners, orientation = correct_skew(img, eval(corners))
+        img, corners, orientation, edge_lines = correct_skew(img, eval(corners))
     else:
-        bin_img, img, corners = get_page_corners(img_bin, img)
+        bin_img, img, corners, edge_lines = get_page_corners(img_bin, img)
 
     print corners
 
@@ -408,19 +421,84 @@ if (img is not None):
 
 
     result, circles, cleaned_lines = get_circles(img_bin, help_lines = lines, ref_img = ref_img)
-    merged_lines = line_merge.merge_lines(cleaned_lines)
+##    cleaned_lines = lines
+    
+    merged_lines = line_merge.merge_lines(cleaned_lines, edge_lines = edge_lines)
+
+##    merged_lines = [
+##                    [[78, 237, 490, 246]],
+##                    [[77, 236, 285, 26]],
+
+##                    [[491, 246, 285, 27]],
+
+##                    [[0, 180, 2, 0]],
+##                    [[139, 366, 428, 376]],
+##                    [[141, 365, 140, 238]],
+##                    [[549, 339, 547, 424]],
+##                    [[430, 376, 432, 245]],
+##                    [[431, 181, 442, 192]],
+##                    [[83, 239, 139, 238]],
+##                    [[549, 0, 549, 84]],
+##                    [[494, 0, 545, 0]],
+##                    [[429, 374, 340, 375]],
+##                    [[0, 384, 1, 424]],
+##                    [[139, 368, 170, 368]],
+##                    [[310, 374, 339, 372]],
+##                    [[135, 176, 136, 176]],
+##                    [[322, 67, 323, 66]],
+##                    [[261, 243, 299, 243]],
+##                    [[61, 161, 62, 161]],
+##                    [[269, 372, 285, 372]],
+##                    [[144, 239, 160, 239]],
+                    
+##                    [[374, 125, 380, 131]]
+
+##                    ]
+
+##    merged_lines = [
+##        [[361, 244, 78, 237]],
+##                    [[77, 236, 285, 26]],
+##                    [[491, 246, 285, 27]],
+##                    [[0, 180, 2, 0]],
+##                    [[139, 366, 429, 374]],
+##                    [[141, 365, 140, 238]],
+##                    [[549, 339, 547, 424]],
+##                    [[430, 376, 432, 245]],
+##                    [[490, 246, 371, 245]],
+##                    [[549, 0, 549, 84]],
+##                    [[494, 0, 545, 0]],
+##                    [[0, 384, 1, 424]],
+##                    [[61, 161, 62, 161]]
+##        ]
+
+##    merged_lines = [
+##    [[367, 549, 155, 241]],
+##    [[340, 395, 244, 364]],
+##    [[290, 186, 316, 275]],
+##    [[281, 85, 159, 238]],
+##    [[257, 367, 70, 315]],
+##    [[165, 234, 73, 314]],
+##    [[314, 272, 344, 396]],
+##    [[282, 85, 291, 189]],
+##    [[148, 251, 155, 243]]
+##    ]
+
+##    merged_lines = [
+##        [[151, 549, 367, 549]],
+##[[149, 247, 155, 241]]
+##        ]
 
     return_lines = []
 ##    merged_lines = cleaned_lines
     for line in merged_lines:
         for x1,y1,x2,y2 in line:
-            cv2.line(result,(x1,y1),(x2,y2),(255,255,0), 5)
+            cv2.line(result,(x1,y1),(x2,y2),(255,255,0), 2)
             return_lines.append([[x1,y1],[x2,y2]])
-##    print merged_lines
+    print merged_lines
 ##    print len(merged_lines)
-    
-    print return_lines
-    print circles
+##    print len(return_lines)
+##    print return_lines
+##    print circles
 
 ##    result = get_page_corners(img_bin)
 ##    result = get_corners(img_bin, ref_img = ref_img)
@@ -428,7 +506,7 @@ if (img is not None):
     if not testing:
         utils.write_result(result = result, save_copy=save_pics)
     else:
-        plt.subplot(121), plt.imshow(orig_img,cmap = 'gray')
+        plt.subplot(121), plt.imshow(img_bin,cmap = 'gray')
         plt.title('Original Image'), plt.xticks([]), plt.yticks([])
         plt.subplot(122),plt.imshow(result,cmap = 'gray')
         plt.title('Edge Image'), plt.xticks([]), plt.yticks([])    

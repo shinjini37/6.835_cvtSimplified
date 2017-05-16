@@ -59,12 +59,12 @@ def clean_lines(match_lines_list, lines):
 ##                print len(temp)
     return lines_copy
 
-def get_match_lines(circle, lines):
+def get_match_lines(circle, lines, growing = True):
     x = circle[0]
     y = circle[1]
     r = circle[2]
-    line_dist_thresh = max(.2*r, 1) #dependent on r
-    
+    line_dist_thresh = 5#min(max(.2*r, 3), 20) #dependent on r
+
     match_lines = []
     for line in lines:
         for x1,y1,x2,y2 in line:
@@ -84,8 +84,9 @@ def get_best_fit_circle(circle, lines):
     done = False
     cent_thresh = 0.025
     r_thresh = 0.025
-    residu_thresh = 0.15
-    ratio_thres = 1.4
+    residu_thresh = 0.5
+    ratio_thres = .8
+    radius_thresh = 5
     max_iter = 500
     num_iter = 0
     while not done:
@@ -120,30 +121,34 @@ def get_best_fit_circle(circle, lines):
         num_iter += 1
         if num_iter>max_iter:
             done = True
-    R = circle[2]        
-    if ((float(residu)/R)<residu_thresh):        
-        arc_length = 2*math.pi*R
-        line_length = 0
-        for line in match_lines:
-            for x1,y1,x2,y2 in line:
-                length = geometry.get_dist([x1, y1], [x2, y2])
-                line_length += length
-        ratio = line_length/float(arc_length)
-        
-        if ratio>ratio_thres:
-##            line_length = 0
-##            merged_lines = line_merge.merge_lines(match_lines, circle=True)
-##            for line in merged_lines:
-##                for x1,y1,x2,y2 in line:
-##                    length = geometry.get_dist([x1, y1], [x2, y2])
-##                    line_length += length
-##
-##            ratio = line_length/float(arc_length)
+    R = circle[2]
+
+##    print got_circle
+##    print residu 
+    if (R>radius_thresh): 
+        if (residu<residu_thresh):        
+            arc_length = 2*math.pi*R
+            line_length = 0
+            for line in match_lines:
+                for x1,y1,x2,y2 in line:
+                    length = geometry.get_dist([x1, y1], [x2, y2])
+                    line_length += length
+            ratio = line_length/float(arc_length)
+##            print line_length, arc_length, ratio
+##            print 
             if ratio>ratio_thres:
-                print got_circle
-                print line_length, arc_length, ratio, (float(residu)/R)
-##                print match_lines
-                return circle, match_lines, line_length, residu
+    ##            line_length = 0
+    ##            merged_lines = line_merge.merge_lines(match_lines, circle=True)
+    ##            for line in merged_lines:
+    ##                for x1,y1,x2,y2 in line:
+    ##                    length = geometry.get_dist([x1, y1], [x2, y2])
+    ##                    line_length += length
+    ##
+    ##            ratio = line_length/float(arc_length)
+                if ratio>ratio_thres:
+##                    print "taken"
+    ##                print match_lines
+                    return circle, match_lines, line_length, residu
 
     return None                
     
@@ -205,7 +210,7 @@ def circle_fit(points):
     xc, yc = center
     Ri       = calc_R(x, y, *center)
     R        = Ri.mean()
-    residu   = np.sum(abs(Ri - R))/len(Ri)#math.pow(np.sum((Ri - R)**2), .5)/len(Ri)
+    residu   = math.pow(np.sum((Ri - R)**2), .5)/len(Ri)
 
     return xc, yc, R, residu
      
