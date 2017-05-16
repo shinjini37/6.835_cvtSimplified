@@ -376,6 +376,8 @@ else:
 ##    path = 'pic_lib/shin_2.jpg'
 ##    path = 'pic_lib/shin_1.jpg'
     path = 'pic_lib/eri_1.jpg'
+##    path = 'pic_lib/j_1.jpg'
+    path = 'pic_lib/j_2.jpg'
 ##    
 ##    path = 'pic_lib/straight1.jpg'
 ##    path = 'pic_lib/line_circ.jpg'

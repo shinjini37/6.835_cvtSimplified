@@ -37,7 +37,7 @@ def write_result(image=None, result=None, save_copy=False):
     
 def shrink_to_size(img, get_dims = False):
     height, width = img.shape[:2]
-    MAX = 1000
+    MAX = 600
     
     max_height = min(height, MAX)
     max_width = min(width, MAX)
