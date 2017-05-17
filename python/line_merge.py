@@ -43,36 +43,48 @@ def get_merged_line(lines):
 ##    return [[end1[0], end1[1], end2[0], end2[1]]]
     return [[max_max_point1[0], max_max_point1[1], max_max_point2[0], max_max_point2[1]]]
 
+def make_check_line_merge_criteria(circle=False):
+    if circle:
+        angle_low_thresh = .1
+        angle_high_thresh = .1
+        length_high_thresh = 75
+        dist_thresh = 1
 
-def check_line_merge_criteria(ref_line, test_line):
-    
-    angle_low_thresh = 2#1
-    angle_high_thresh = 7
-    length_high_thresh = 75
-    dist_thresh = 5
+        min_length = 0
+        min_length_dist = 0
+        
+    else:        
+        angle_low_thresh = 2#1
+        angle_high_thresh = 7
+        length_high_thresh = 75
+        dist_thresh = 5
 
-    min_length = 10
-    min_length_dist = 2
-    
+        min_length = 5
+        min_length_dist = 2
+                
+    def check_line_merge_criteria(ref_line, test_line):
+        
 
-    merge = False
+        merge = False
 
-    test_line_length = geometry.get_line_length(test_line)
-    dist = geometry.get_min_dist_line_segments(ref_line, test_line)
-    diff = geometry.get_angle_diff(ref_line, test_line)
-    
-    if test_line_length<min_length:
-        if dist<min_length_dist:
-            merge = True
-            
-    if (dist<dist_thresh):
-        if (test_line_length>length_high_thresh):
-            if (diff < angle_low_thresh):
-                merge = True
-        else:
-            if (diff < angle_high_thresh):
-                merge = True
-    return merge
+        test_line_length = geometry.get_line_length(test_line)
+        dist = geometry.get_min_dist_line_segments(ref_line, test_line)
+        diff = geometry.get_angle_diff(ref_line, test_line)
+        
+##        if test_line_length<min_length:
+##            if dist<min_length_dist:
+##                merge = True
+                
+        if (dist<dist_thresh):
+            if (test_line_length>length_high_thresh):
+                if (diff < angle_low_thresh):
+                    merge = True
+            else:
+                if (diff < angle_high_thresh):
+                    merge = True
+        return merge
+
+    return check_line_merge_criteria
 
 def clean_merge_lines(merge_lines, edge_lines):
     cleaned_lines = []
@@ -99,8 +111,8 @@ def clean_merge_line(line, edge_lines):
     return clean
     
 
-def merge_lines(lines, edge_lines = []):
-    merged_lines = general_merge.merge(lines, get_merged_line, check_line_merge_criteria)
+def merge_lines(lines, edge_lines = [], circle=False):
+    merged_lines = general_merge.merge(lines, get_merged_line, make_check_line_merge_criteria(circle))
     merged_lines = clean_merge_lines(merged_lines, edge_lines)
     return merged_lines
 
