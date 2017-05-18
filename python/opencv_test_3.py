@@ -6,6 +6,8 @@ import circle_processing
 import line_merge
 import geometry
 
+import time
+
 
 def get_circles(img, ref_img=None, help_lines=None):
     if ref_img is None:
@@ -19,8 +21,11 @@ def get_circles(img, ref_img=None, help_lines=None):
     dp = 1
     min_dist = 20
     param1 = 50 # tested value
-##    param2 = 40 # tested value
-    param2 = 20
+    param2 = 20 # tested value
+##
+##    param1 = 70
+##    param2 = 40
+
     
     hough_circles = cv2.HoughCircles(cimg,cv2.HOUGH_GRADIENT, dp, min_dist,
                                 param1=param1,param2=param2,minRadius=0,maxRadius=0)
@@ -40,7 +45,7 @@ def get_circles(img, ref_img=None, help_lines=None):
 ##            cv2.circle(ref_img,(x,y),2,(0,0,255),3)
 
 ##    if testing:
-##        print "circles", circles
+##        print "circles", len(circles[0])
 ##        for got_circle in circles[0]:
 ##            xc = int(got_circle[0])
 ##            yc = int(got_circle[1])
@@ -50,6 +55,7 @@ def get_circles(img, ref_img=None, help_lines=None):
 ##            cv2.circle(cimg,(xc,yc),R,(0,190,255),2)
 ##            # draw the center of the circle
 ##            cv2.circle(cimg,(xc,yc),3,(255,255,0),3)
+##            
 ##        plt.subplot(121), plt.imshow(img,cmap = 'gray')
 ##        plt.title('Original Image'), plt.xticks([]), plt.yticks([])
 ##        plt.subplot(122),plt.imshow(cimg,cmap = 'gray')
@@ -144,6 +150,15 @@ def get_lines(img, ref_img = None, params = None):
         for x1,y1,x2,y2 in line:
             cv2.line(line_img,(x1,y1),(x2,y2),(0,255,0), 1)
 ##            cv2.line(blank_image,(x1,y1),(x2,y2),(0,0,0), 1)
+
+##    print len(lines)
+##    
+##    plt.subplot(121), plt.imshow(img,cmap = 'gray')
+##    plt.title('Original Image'), plt.xticks([]), plt.yticks([])
+##    plt.subplot(122),plt.imshow(line_img,cmap = 'gray')
+##    plt.title('Edge Image'), plt.xticks([]), plt.yticks([])    
+##    plt.show()
+
     
     blank_image = cv2.cvtColor(blank_image,cv2.COLOR_BGR2GRAY)
 
@@ -350,7 +365,68 @@ def get_page_corners(bin_img, img):
     bin_img, corners, orientation, edge_lines = correct_skew(bin_img, corners)
         
     return bin_img, img, corners, edge_lines
-
+##
+### from http://www.pyimagesearch.com/2017/01/02/rotate-images-correctly-with-opencv-and-python/
+##def rotate_bound(image, angle):
+##    # grab the dimensions of the image and then determine the
+##    # center
+##    (h, w) = image.shape[:2]
+##    (cX, cY) = (w // 2, h // 2)
+## 
+##    # grab the rotation matrix (applying the negative of the
+##    # angle to rotate clockwise), then grab the sine and cosine
+##    # (i.e., the rotation components of the matrix)
+##    M = cv2.getRotationMatrix2D((cX, cY), -angle, 1.0)
+##    print M
+##    cos = np.abs(M[0, 0])
+##    sin = np.abs(M[0, 1])
+## 
+##    # compute the new bounding dimensions of the image
+##    nW = int((h * sin) + (w * cos))
+##    nH = int((h * cos) + (w * sin))
+## 
+##    # adjust the rotation matrix to take into account translation
+##    M[0, 2] += (nW / 2) - cX
+##    M[1, 2] += (nH / 2) - cY
+## 
+##    # perform the actual rotation and return the image
+##    return cv2.warpAffine(image, M, (nW, nH))
+##
+##def rotate_point(point,image,angle):
+##    def apply_m(point, M):        
+##        point_inv = [point[1], point[0]]
+##
+##        point_inv = [
+##            point_inv[0]*M[0][0] + point_inv[1]*M[1][0],
+##            point_inv[0]*M[0][1] + point_inv[1]*M[1][1]
+##            ]
+##
+##        point = [point_inv[1], point_inv[0]]
+####        point = [
+####            point[0]*M[0][0] + point[1]*M[1][0],
+####            point[0]*M[0][1] + point[1]*M[1][1]
+####            ]
+##
+##
+##        return point
+##
+##    (h, w) = image.shape[:2]
+##    center = (w // 2, h // 2)
+## 
+##    M = cv2.getRotationMatrix2D(center, -angle, 1.0)
+##    point[0] = point[0]-center[0]
+##    point[1] = point[1]-center[1]
+##
+##
+##    point = apply_m(point, M)
+##    [nw,nh] = apply_m(center,M)
+##    print center
+##    print nw, nh
+##    
+##    point[0] = point[0] + nw
+##    point[1] = point[1] + nh
+##    
+##    return point    
 
 save_pics = True
 ##save_pics = False
@@ -379,7 +455,7 @@ else:
 ##    path = 'pic_lib/j_1.jpg'
 ##    path = 'pic_lib/j_2.jpg'
 ##    
-##    path = 'pic_lib/straight1.jpg'
+    path = 'pic_lib/straight1.jpg'
 ##    path = 'pic_lib/line_circ.jpg'
 ##    path = 'pic_lib/circ.jpg'
 ##    path = 'pic_lib/blur_tri.jpg'
@@ -388,11 +464,16 @@ else:
 ##    path = 'pic_lib/test1.jpg'
 ##    path = 'pic_lib/test2.jpg'
 ##    path = 'pic_lib/test3.jpg'
+##    path = 'test_lib/crop_1.jpg'
+##    path = 'test_lib/line_2.jpg'
 
     corners = 'None'
 
 img = cv2.imread(path,0)
 if (img is not None):
+    
+    start = time.time()
+    
     img = utils.shrink_to_size(img)
     orig_img = img.copy()
 
@@ -417,78 +498,13 @@ if (img is not None):
     ref_img = cv2.cvtColor(img,cv2.COLOR_GRAY2BGR)
 
     result = ref_img
-    
+        
     result, lines, bin_lines = get_lines(img_bin, ref_img = ref_img)
-
-
 
     result, circles, cleaned_lines = get_circles(img_bin, help_lines = lines, ref_img = ref_img)
 ##    cleaned_lines = lines
     
     merged_lines = line_merge.merge_lines(cleaned_lines, edge_lines = edge_lines)
-
-##    merged_lines = [
-##                    [[78, 237, 490, 246]],
-##                    [[77, 236, 285, 26]],
-
-##                    [[491, 246, 285, 27]],
-
-##                    [[0, 180, 2, 0]],
-##                    [[139, 366, 428, 376]],
-##                    [[141, 365, 140, 238]],
-##                    [[549, 339, 547, 424]],
-##                    [[430, 376, 432, 245]],
-##                    [[431, 181, 442, 192]],
-##                    [[83, 239, 139, 238]],
-##                    [[549, 0, 549, 84]],
-##                    [[494, 0, 545, 0]],
-##                    [[429, 374, 340, 375]],
-##                    [[0, 384, 1, 424]],
-##                    [[139, 368, 170, 368]],
-##                    [[310, 374, 339, 372]],
-##                    [[135, 176, 136, 176]],
-##                    [[322, 67, 323, 66]],
-##                    [[261, 243, 299, 243]],
-##                    [[61, 161, 62, 161]],
-##                    [[269, 372, 285, 372]],
-##                    [[144, 239, 160, 239]],
-                    
-##                    [[374, 125, 380, 131]]
-
-##                    ]
-
-##    merged_lines = [
-##        [[361, 244, 78, 237]],
-##                    [[77, 236, 285, 26]],
-##                    [[491, 246, 285, 27]],
-##                    [[0, 180, 2, 0]],
-##                    [[139, 366, 429, 374]],
-##                    [[141, 365, 140, 238]],
-##                    [[549, 339, 547, 424]],
-##                    [[430, 376, 432, 245]],
-##                    [[490, 246, 371, 245]],
-##                    [[549, 0, 549, 84]],
-##                    [[494, 0, 545, 0]],
-##                    [[0, 384, 1, 424]],
-##                    [[61, 161, 62, 161]]
-##        ]
-
-##    merged_lines = [
-##    [[367, 549, 155, 241]],
-##    [[340, 395, 244, 364]],
-##    [[290, 186, 316, 275]],
-##    [[281, 85, 159, 238]],
-##    [[257, 367, 70, 315]],
-##    [[165, 234, 73, 314]],
-##    [[314, 272, 344, 396]],
-##    [[282, 85, 291, 189]],
-##    [[148, 251, 155, 243]]
-##    ]
-
-##    merged_lines = [
-##        [[151, 549, 367, 549]],
-##[[149, 247, 155, 241]]
-##        ]
 
     return_lines = []
 ##    merged_lines = cleaned_lines
@@ -497,13 +513,18 @@ if (img is not None):
             cv2.line(result,(x1,y1),(x2,y2),(255,255,0), 2)
             return_lines.append([[x1,y1],[x2,y2]])
     print merged_lines
-##    print len(merged_lines)
+    print 'num lines: ', len(merged_lines)
+
 ##    print len(return_lines)
 ##    print return_lines
-##    print circles
+    print circles
+    print 'num circles: ', len(circles)
 
 ##    result = get_page_corners(img_bin)
 ##    result = get_corners(img_bin, ref_img = ref_img)
+
+    end = time.time()
+    print 'time: ', (end - start)
 
     if not testing:
         utils.write_result(result = result, save_copy=save_pics)
@@ -521,6 +542,68 @@ if (img is not None):
 ##
 
 
+    ##    merged_lines = [
+    ##                    [[78, 237, 490, 246]],
+    ##                    [[77, 236, 285, 26]],
+
+    ##                    [[491, 246, 285, 27]],
+
+    ##                    [[0, 180, 2, 0]],
+    ##                    [[139, 366, 428, 376]],
+    ##                    [[141, 365, 140, 238]],
+    ##                    [[549, 339, 547, 424]],
+    ##                    [[430, 376, 432, 245]],
+    ##                    [[431, 181, 442, 192]],
+    ##                    [[83, 239, 139, 238]],
+    ##                    [[549, 0, 549, 84]],
+    ##                    [[494, 0, 545, 0]],
+    ##                    [[429, 374, 340, 375]],
+    ##                    [[0, 384, 1, 424]],
+    ##                    [[139, 368, 170, 368]],
+    ##                    [[310, 374, 339, 372]],
+    ##                    [[135, 176, 136, 176]],
+    ##                    [[322, 67, 323, 66]],
+    ##                    [[261, 243, 299, 243]],
+    ##                    [[61, 161, 62, 161]],
+    ##                    [[269, 372, 285, 372]],
+    ##                    [[144, 239, 160, 239]],
+                        
+    ##                    [[374, 125, 380, 131]]
+
+    ##                    ]
+
+    ##    merged_lines = [
+    ##        [[361, 244, 78, 237]],
+    ##                    [[77, 236, 285, 26]],
+    ##                    [[491, 246, 285, 27]],
+    ##                    [[0, 180, 2, 0]],
+    ##                    [[139, 366, 429, 374]],
+    ##                    [[141, 365, 140, 238]],
+    ##                    [[549, 339, 547, 424]],
+    ##                    [[430, 376, 432, 245]],
+    ##                    [[490, 246, 371, 245]],
+    ##                    [[549, 0, 549, 84]],
+    ##                    [[494, 0, 545, 0]],
+    ##                    [[0, 384, 1, 424]],
+    ##                    [[61, 161, 62, 161]]
+    ##        ]
+
+    ##    merged_lines = [
+    ##    [[367, 549, 155, 241]],
+    ##    [[340, 395, 244, 364]],
+    ##    [[290, 186, 316, 275]],
+    ##    [[281, 85, 159, 238]],
+    ##    [[257, 367, 70, 315]],
+    ##    [[165, 234, 73, 314]],
+    ##    [[314, 272, 344, 396]],
+    ##    [[282, 85, 291, 189]],
+    ##    [[148, 251, 155, 243]]
+    ##    ]
+
+    ##    merged_lines = [
+    ##        [[151, 549, 367, 549]],
+    ##[[149, 247, 155, 241]]
+    ##        ]
 
 
 
