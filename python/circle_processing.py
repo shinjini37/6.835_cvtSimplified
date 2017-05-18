@@ -55,8 +55,6 @@ def clean_lines(match_lines_list, lines):
                     if (i not in idxs):
                         temp.append(lines_copy[i])
                 lines_copy = temp
-##                print old_len
-##                print len(temp)
     return lines_copy
 
 def get_match_lines(circle, lines):
@@ -161,7 +159,6 @@ def get_best_circles(circles, lines):
                             length = geometry.get_line_length(line)
                             line_length += length 
                         ratio = line_length/float(arc_length)
-                        print ratio
                             
                         if ratio>ratio_thres:
                             best_circles.append(circle)#(circle, got_circle, match_lines))
@@ -201,7 +198,3 @@ def circle_fit(points):
 
     return xc, yc, R, residu
      
-
-##print clean_lines([[[[1, 1, 1, 1]]]], [[[1, 1, 1, 1]], [[1, 1, 2, 1]]])
-##print clean_lines([[[[1, 1, 1, 1]]]], [[[1, 1, 1, 1]], [[1, 1, 1, 1]]])
-##print clean_lines([[[[1, 1, 1, 1]], [[1, 1, 1, 2]]]], [[[1, 1, 1, 1]], [[1, 1, 1, 1]]])

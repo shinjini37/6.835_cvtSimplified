@@ -99,7 +99,7 @@ router.post('/upload', upload.single('file'), function(req, res, next) {
 
 router.get('/result', function(req, res, next) {
     console.log('got here at least 2 ');
-    var scriptName = './python/opencv_test_3.py';
+    var scriptName = './python/main.py';
     var inputs = ['./python/image.png', 'None'];
     var messages = [];
     var makeOnMessageFunction = function(messages){
@@ -126,7 +126,7 @@ router.post('/corners', function(req, res, next) {
     var corners = req.body.corners || "None";
     console.log(req.body);
     console.log(corners);
-    var scriptName = './python/opencv_test_3.py';
+    var scriptName = './python/main.py';
     var inputs = ['./python/image.png', corners];
     var messages = [];
     var makeOnMessageFunction = function(messages){

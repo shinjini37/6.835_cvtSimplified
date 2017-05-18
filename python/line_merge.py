@@ -39,8 +39,6 @@ def get_merged_line(lines):
                 max_max_point1 = max_point1
                 max_max_point2 = max_point2
     
-        
-##    return [[end1[0], end1[1], end2[0], end2[1]]]
     return [[max_max_point1[0], max_max_point1[1], max_max_point2[0], max_max_point2[1]]]
 
 def make_check_line_merge_criteria(circle=False):
@@ -70,7 +68,8 @@ def make_check_line_merge_criteria(circle=False):
         test_line_length = geometry.get_line_length(test_line)
         dist = geometry.get_min_dist_line_segments(ref_line, test_line)
         diff = geometry.get_angle_diff(ref_line, test_line)
-        
+
+     ## this generally causes bad merges and results in directions changing easily   
 ##        if test_line_length<min_length:
 ##            if dist<min_length_dist:
 ##                merge = True
@@ -115,53 +114,3 @@ def merge_lines(lines, edge_lines = [], circle=False):
     merged_lines = general_merge.merge(lines, get_merged_line, make_check_line_merge_criteria(circle))
     merged_lines = clean_merge_lines(merged_lines, edge_lines)
     return merged_lines
-
-##test = [[[406, 536, 419, 283]],
-##
-## [[408, 533, 417, 360]],
-##
-## [[ 34,  23, 206 , 23]],
-##
-## [[412, 378, 436,  24]],
-##
-## [[ 58,  25, 360,  25]],
-##
-## [[167, 550, 375, 540]],
-##
-## [[ 46,  24, 360,  24]],
-##
-## [[ 17, 232,  25, 403]],
-##
-## [[ 17,  22, 202,  22]],
-##
-## [[ 17, 223,  26, 387]],
-##
-## [[427, 174, 438,  24]],
-##
-## [[  7,  48,  21, 262]],
-##
-## [[196,  26, 355,  26]]]
-##
-##merge_lines(test)
-##point = [0,2]
-##line = [[1,0,2,0]]
-##line2 = [[2,1,3,2]]
-##
-####print dist_from_point_to_line_segment(point, line)
-##print get_lines_intersect(line, line2)
-
-##[[269, 414, 581, 409]]
-##179.081876998
-##[[15, 416, 541, 409]]
-##179.237553646
-##[[590, 404, 501, 68]]
-##75.1641464871
-##[[161, 52, 500, 68]]
-##2.70222026813
-##[[492, 412, 386, 413]]
-##179.459489813
-##[[63, 141, 21, 349]]
-##101.415839524
-##[[6, 409, 41, 256]]
-##102.8851694
-##print get_min_dist_line_segments([[6, 409, 41, 256]], [[63, 141, 21, 349]])

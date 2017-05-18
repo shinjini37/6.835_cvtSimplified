@@ -15,17 +15,11 @@ def get_circles(img, ref_img=None, help_lines=None):
     height, width = img.shape[:2]
     
     cimg = img.copy()
-##    inv_img = cv2.bitwise_not(img)    
-##    cimg = cv2.medianBlur(img,1)
-##    cimg = cv2.GaussianBlur(img,(5,5),0)
+
     dp = 1
     min_dist = 20
     param1 = 50 # tested value
     param2 = 20 # tested value
-##
-##    param1 = 70
-##    param2 = 40
-
     
     hough_circles = cv2.HoughCircles(cimg,cv2.HOUGH_GRADIENT, dp, min_dist,
                                 param1=param1,param2=param2,minRadius=0,maxRadius=0)
@@ -34,84 +28,22 @@ def get_circles(img, ref_img=None, help_lines=None):
         hough_circles = [[]]
     hough_circles = np.uint16(np.around(hough_circles))
     circles = hough_circles
-##    for circle in circles[0]:
-##        x = circle[0]
-##        y = circle[1]
-##        r = circle[2]
-##        if (r*2 <= height and r*2 <= width):
-##            # draw the outer circle
-##            cv2.circle(ref_img,(x,y),r,(0,255,0),2)
-##            # draw the center of the circle
-##            cv2.circle(ref_img,(x,y),2,(0,0,255),3)
-
-##    if testing:
-##        print "circles", len(circles[0])
-##        for got_circle in circles[0]:
-##            xc = int(got_circle[0])
-##            yc = int(got_circle[1])
-##            R = int(got_circle[2])
-##
-##            # draw the outer circle
-##            cv2.circle(cimg,(xc,yc),R,(0,190,255),2)
-##            # draw the center of the circle
-##            cv2.circle(cimg,(xc,yc),3,(255,255,0),3)
-##            
-##        plt.subplot(121), plt.imshow(img,cmap = 'gray')
-##        plt.title('Original Image'), plt.xticks([]), plt.yticks([])
-##        plt.subplot(122),plt.imshow(cimg,cmap = 'gray')
-##        plt.title('Edge Image'), plt.xticks([]), plt.yticks([])    
-##        plt.show()
         
     if help_lines is not None:
         circles, cleaned_lines, orig_circles = circle_processing.get_best_circles(circles, help_lines)
         
-    ##    for circle, got_circle, used_lines in debug_stuff:
     for got_circle in circles:
-    
-##        x = circle[0]
-##        y = circle[1]
-##        r = circle[2]
-
         xc = int(got_circle[0])
         yc = int(got_circle[1])
         R = int(got_circle[2])
 
-        
-##        # draw the outer circle
-##        cv2.circle(img,(x,y),r,(0,255,0),2)
-##        # draw the center of the circle
-##        cv2.circle(img,(x,y),2,(0,0,255),3)
 
         # draw the outer circle
         cv2.circle(ref_img,(xc,yc),R,(255,0,255),1)
         # draw the center of the circle
         cv2.circle(ref_img,(xc,yc),3,(0,0,255),2)
 
-##    for got_circle in orig_circles:
-##    
-##        xc = int(got_circle[0])
-##        yc = int(got_circle[1])
-##        R = int(got_circle[2])
-##
-##        # draw the outer circle
-##        cv2.circle(ref_img,(xc,yc),R,(0,190,255),2)
-##        # draw the center of the circle
-##        cv2.circle(ref_img,(xc,yc),3,(255,255,0),3)
-        
-
-##        for line in used_lines:
-##            for x1,y1,x2,y2 in line:
-##                cv2.line(img,(x1,y1),(x2,y2),(0,255,0), 10)
-
-##    for line in help_lines:
-##        for x1,y1,x2,y2 in line:
-##            cv2.line(ref_img,(x1,y1),(x2,y2),(255,255,0), 1)
-##    
-
     return ref_img, circles, cleaned_lines
-
-
-
 
 
 def get_lines(img, ref_img = None, params = None):
@@ -120,7 +52,7 @@ def get_lines(img, ref_img = None, params = None):
     if params is None:
         minLineLength = 1
         maxLineGap = 1
-        threshold = 25 #25
+        threshold = 25
         blur = 3
     else:
         minLineLength = params["minLineLength"]
@@ -134,9 +66,6 @@ def get_lines(img, ref_img = None, params = None):
     if (ref_img is None):
         ref_img = cv2.cvtColor(inv_img,cv2.COLOR_GRAY2BGR)
     
-##    gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-##    edges = cv2.Canny(img,50,150,apertureSize = 3)
-##    edges = get_edges(img)
     line_img = ref_img
 
     blank_image = cv2.bitwise_not(np.zeros((height,width,3), np.uint8))
@@ -145,27 +74,13 @@ def get_lines(img, ref_img = None, params = None):
 
     if (lines is None):
         lines = []
-##    print len(lines)
     for line in lines:
         for x1,y1,x2,y2 in line:
             cv2.line(line_img,(x1,y1),(x2,y2),(0,255,0), 1)
-##            cv2.line(blank_image,(x1,y1),(x2,y2),(0,0,0), 1)
-
-##    print len(lines)
-##    
-##    plt.subplot(121), plt.imshow(img,cmap = 'gray')
-##    plt.title('Original Image'), plt.xticks([]), plt.yticks([])
-##    plt.subplot(122),plt.imshow(line_img,cmap = 'gray')
-##    plt.title('Edge Image'), plt.xticks([]), plt.yticks([])    
-##    plt.show()
-
     
     blank_image = cv2.cvtColor(blank_image,cv2.COLOR_BGR2GRAY)
 
     return (line_img, lines, blank_image)
-
-
-
 
 
 def get_corners(img, ref_img=None):
@@ -181,9 +96,6 @@ def get_corners(img, ref_img=None):
             x, y = i.ravel()
             cv2.circle(corner_img, (x, y), 3, 255, -1)
     return corner_img
-
-
-
 
 
 def correct_skew(img, corners):
@@ -237,10 +149,6 @@ def correct_skew(img, corners):
         av_width = (width1+width2)/2.0
         av_height = (height1+height2)/2.0
         
-##        av_width = (abs(corners[1][0]-corners[0][0]) + abs(corners[2][0]-corners[3][0]))/2.0
-##        av_height = (abs(corners[3][1]-corners[0][1]) + abs(corners[2][1]-corners[1][1]))/2.0
-
-##        if (av_height>=av_width):
         if max(height1, height2)>=max(width1, width2):            
             corrected_corners = corrected_corners_portrait
             orientation = 'portrait'
@@ -276,35 +184,7 @@ def get_page_corners(bin_img, img):
 
     result, lines, bin_lines = get_lines(bin_img, params = params)
     merged_lines = line_merge.merge_lines(lines)
-##    bin_lines = cv2.bitwise_not(bin_lines)
-
-##    params = {
-##        "minLineLength": 4,
-##        "maxLineGap": 100,
-##        "threshold": 50,
-##        "blur": None
-##        }
-##
-##    result, lines, bin_lines = get_lines(bin_lines, params = params)
-##    
-##    print lines
-##    def get_angle(line):
-##        for x1,y1,x2,y2 in line:
-##            angle = math.degrees(math.atan((y1-y2)/float(x1-x2)))%180
-##        return angle
-##
-##    for line in lines:
-##        print get_angle(line)
-    
-##    plt.subplot(121), plt.imshow(img,cmap = 'gray')
-##    plt.title('Original Image'), plt.xticks([]), plt.yticks([])
-##    plt.subplot(122),plt.imshow(result,cmap = 'gray')
-##    plt.title('Edge Image'), plt.xticks([]), plt.yticks([])    
-##    plt.show()
-####    
     height, width = img.shape[:2]
-##    print width, height
-##    print merged_lines
 
     img_corners = [[0,0], [width, 0], [width, height], [0, height]]
     edge_lines = []#[[[0,0,width, 0]],[[0,0,0,height]],[[width,0,width,height]],[[0,height,width,height]]]
@@ -314,12 +194,9 @@ def get_page_corners(bin_img, img):
     for img_corner in img_corners:
         min_dist = float('inf')
         best_corner = None
-##        print "image corner", img_corner
         for line in merged_lines:
             if geometry.get_line_length(line)>min(height/8.0, width/8.0):
                 dist, intersect = geometry.dist_from_point_to_line_segment(img_corner, line)
-    ##            print line
-    ##            print dist, intersect
                 if (dist<min_dist):
                     min_dist = dist
                     best_corner = intersect
@@ -329,35 +206,6 @@ def get_page_corners(bin_img, img):
             else:
                 corners.append(best_corner)
     
-####    
-##    max_x = 0
-##    max_y = 0
-##    min_x = width
-##    min_y = height
-##    
-##    for line in lines:
-##        for x1,y1,x2,y2 in line:
-##            if x1>max_x:
-##                max_x = x1
-##            if x2>max_x:
-##                max_x = x1
-##            if y1>max_y:
-##                max_y = y1
-##            if y2>max_y:
-##                max_y = y2
-##
-##            if x1<min_x:
-##                min_x = x1
-##            if x2<min_x:
-##                min_x = x2
-##            if y1<min_y:
-##                min_y = y1
-##            if y2<min_y:
-##                min_y = y2
-##
-##    extremes = [min_x, min_y, max_x, max_y]
-##    corners = [[min_x, min_y], [max_x, min_y], [max_x, max_y], [min_x, max_y]]
-##    print corners
     if len(corners)==0:    
         corners = img_corners
     
@@ -365,6 +213,7 @@ def get_page_corners(bin_img, img):
     bin_img, corners, orientation, edge_lines = correct_skew(bin_img, corners)
         
     return bin_img, img, corners, edge_lines
+
 ##
 ### from http://www.pyimagesearch.com/2017/01/02/rotate-images-correctly-with-opencv-and-python/
 ##def rotate_bound(image, angle):
@@ -502,29 +351,23 @@ if (img is not None):
     result, lines, bin_lines = get_lines(img_bin, ref_img = ref_img)
 
     result, circles, cleaned_lines = get_circles(img_bin, help_lines = lines, ref_img = ref_img)
-##    cleaned_lines = lines
     
     merged_lines = line_merge.merge_lines(cleaned_lines, edge_lines = edge_lines)
 
     return_lines = []
-##    merged_lines = cleaned_lines
+
     for line in merged_lines:
         for x1,y1,x2,y2 in line:
             cv2.line(result,(x1,y1),(x2,y2),(255,255,0), 2)
             return_lines.append([[x1,y1],[x2,y2]])
-    print merged_lines
-    print 'num lines: ', len(merged_lines)
 
-##    print len(return_lines)
-##    print return_lines
+##    print 'num lines: ', len(merged_lines)
+    print return_lines
     print circles
-    print 'num circles: ', len(circles)
-
-##    result = get_page_corners(img_bin)
-##    result = get_corners(img_bin, ref_img = ref_img)
+##    print 'num circles: ', len(circles)
 
     end = time.time()
-    print 'time: ', (end - start)
+##    print 'time: ', (end - start)
 
     if not testing:
         utils.write_result(result = result, save_copy=save_pics)
@@ -540,100 +383,3 @@ if (img is not None):
 ####    cv2.waitKey(0)
 ####    cv2.destroyAllWindows()
 ##
-
-
-    ##    merged_lines = [
-    ##                    [[78, 237, 490, 246]],
-    ##                    [[77, 236, 285, 26]],
-
-    ##                    [[491, 246, 285, 27]],
-
-    ##                    [[0, 180, 2, 0]],
-    ##                    [[139, 366, 428, 376]],
-    ##                    [[141, 365, 140, 238]],
-    ##                    [[549, 339, 547, 424]],
-    ##                    [[430, 376, 432, 245]],
-    ##                    [[431, 181, 442, 192]],
-    ##                    [[83, 239, 139, 238]],
-    ##                    [[549, 0, 549, 84]],
-    ##                    [[494, 0, 545, 0]],
-    ##                    [[429, 374, 340, 375]],
-    ##                    [[0, 384, 1, 424]],
-    ##                    [[139, 368, 170, 368]],
-    ##                    [[310, 374, 339, 372]],
-    ##                    [[135, 176, 136, 176]],
-    ##                    [[322, 67, 323, 66]],
-    ##                    [[261, 243, 299, 243]],
-    ##                    [[61, 161, 62, 161]],
-    ##                    [[269, 372, 285, 372]],
-    ##                    [[144, 239, 160, 239]],
-                        
-    ##                    [[374, 125, 380, 131]]
-
-    ##                    ]
-
-    ##    merged_lines = [
-    ##        [[361, 244, 78, 237]],
-    ##                    [[77, 236, 285, 26]],
-    ##                    [[491, 246, 285, 27]],
-    ##                    [[0, 180, 2, 0]],
-    ##                    [[139, 366, 429, 374]],
-    ##                    [[141, 365, 140, 238]],
-    ##                    [[549, 339, 547, 424]],
-    ##                    [[430, 376, 432, 245]],
-    ##                    [[490, 246, 371, 245]],
-    ##                    [[549, 0, 549, 84]],
-    ##                    [[494, 0, 545, 0]],
-    ##                    [[0, 384, 1, 424]],
-    ##                    [[61, 161, 62, 161]]
-    ##        ]
-
-    ##    merged_lines = [
-    ##    [[367, 549, 155, 241]],
-    ##    [[340, 395, 244, 364]],
-    ##    [[290, 186, 316, 275]],
-    ##    [[281, 85, 159, 238]],
-    ##    [[257, 367, 70, 315]],
-    ##    [[165, 234, 73, 314]],
-    ##    [[314, 272, 344, 396]],
-    ##    [[282, 85, 291, 189]],
-    ##    [[148, 251, 155, 243]]
-    ##    ]
-
-    ##    merged_lines = [
-    ##        [[151, 549, 367, 549]],
-    ##[[149, 247, 155, 241]]
-    ##        ]
-
-
-
-
-
-
-##    merged_lines = [
-####        [[0, 424, 3, 0]],
-##        
-####        [[291, 29, 82, 236]],
-####        [[442, 368, 149, 366]],
-####                    [[291, 28, 499, 241]],
-####        [[498, 242, 83, 237]],
-##        [[397, 0, 549, 1]],
-####                    [[146, 238, 147, 368]],
-##        [[437, 424, 549, 420]],
-####        [[442, 367, 440, 244]],
-##        
-##                    [[546, 3, 548, 2]],
-##        ###### circle segments
-####        [[374, 227, 376, 250]],
-####        [[251, 154, 263, 148]],
-####                    [[321, 320, 352, 298]], [[201, 269, 225, 303]], [[340, 164, 367, 197]],
-####                    [[198, 209, 210, 187]], [[206, 190, 243, 155]], [[262, 320, 290, 327]],
-####                    [[365, 281, 336, 312]], [[369, 274, 375, 243]], [[369, 201, 376, 236]],
-####                    [[340, 165, 302, 147]], [[4, 1, 51, 0]], [[195, 225, 202, 203]],
-####                    [[232, 309, 269, 324]], [[196, 253, 206, 275]], [[291, 326, 324, 317]],
-####                    [[379, 367, 383, 368]], [[363, 282, 369, 267]], [[199, 259, 195, 239]],
-####                    [[262, 149, 296, 146]], [[238, 311, 219, 294]], [[276, 145, 286, 146]],
-####                    [[226, 167, 230, 164]], [[197, 216, 197, 211]], [[243, 156, 254, 152]],
-####                    [[292, 148, 297, 148]], [[363, 193, 367, 203]], [[309, 321, 311, 321]],
-####                    [[362, 188, 339, 165]], [[276, 323, 282, 323]]
-##        ]
