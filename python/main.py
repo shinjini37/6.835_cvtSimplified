@@ -9,6 +9,26 @@ import geometry
 import time
 
 
+## **** To run manually, uncomment "testing = False" and
+## put the pathname of the desired file instead
+## of "path = 'test_lib/crop_6.jpg'" ****
+    
+save_pics = True
+##save_pics = False
+
+testing = True
+##testing = False
+
+if not testing:
+    path = raw_input()
+    corners = raw_input()
+
+else:
+    path = 'test_lib/crop_6.jpg'
+    corners = 'None'
+
+
+
 def get_circles(img, ref_img=None, help_lines=None):
     if ref_img is None:
         ref_img = cv2.cvtColor(img,cv2.COLOR_GRAY2BGR)
@@ -277,47 +297,6 @@ def get_page_corners(bin_img, img):
 ##    
 ##    return point    
 
-save_pics = True
-##save_pics = False
-
-testing = True
-##testing = False
-
-if not testing:
-    path = raw_input()
-    corners = raw_input()
-
-else:
-##    path = 'pic_lib/1.jpg'
-    path = 'pic_lib/lor_1.jpg'
-    path = 'pic_lib/huy_1.jpg'
-##    path = 'pic_lib/huy_2.jpg'
-##    path = 'pic_lib/sou_1.jpg'
-##    path = 'pic_lib/jul_1.jpg'
-##    path = 'pic_lib/jul_2.jpg'
-##    path = 'pic_lib/shin_5.jpg'
-##    path = 'pic_lib/shin_4.jpg'
-##    path = 'pic_lib/shin_3.jpg'
-##    path = 'pic_lib/shin_2.jpg'
-##    path = 'pic_lib/shin_1.jpg'
-##    path = 'pic_lib/eri_1.jpg'
-##    path = 'pic_lib/j_1.jpg'
-##    path = 'pic_lib/j_2.jpg'
-##    
-    path = 'pic_lib/straight1.jpg'
-##    path = 'pic_lib/line_circ.jpg'
-##    path = 'pic_lib/circ.jpg'
-##    path = 'pic_lib/blur_tri.jpg'
-##    path = 'pic_lib/tri.jpg'
-##    path = 'pic_lib/skewed.jpg'
-##    path = 'pic_lib/test1.jpg'
-##    path = 'pic_lib/test2.jpg'
-##    path = 'pic_lib/test3.jpg'
-##    path = 'test_lib/crop_1.jpg'
-##    path = 'test_lib/line_2.jpg'
-
-    corners = 'None'
-
 img = cv2.imread(path,0)
 if (img is not None):
     
@@ -361,13 +340,13 @@ if (img is not None):
             cv2.line(result,(x1,y1),(x2,y2),(255,255,0), 2)
             return_lines.append([[x1,y1],[x2,y2]])
 
-##    print 'num lines: ', len(merged_lines)
     print return_lines
+    print 'num lines: ', len(return_lines)
     print circles
-##    print 'num circles: ', len(circles)
+    print 'num circles: ', len(circles)
 
     end = time.time()
-##    print 'time: ', (end - start)
+    print 'time: ', (end - start)
 
     if not testing:
         utils.write_result(result = result, save_copy=save_pics)
@@ -375,11 +354,6 @@ if (img is not None):
         plt.subplot(121), plt.imshow(img_bin,cmap = 'gray')
         plt.title('Original Image'), plt.xticks([]), plt.yticks([])
         plt.subplot(122),plt.imshow(result,cmap = 'gray')
-        plt.title('Edge Image'), plt.xticks([]), plt.yticks([])    
+        plt.title('Result Image'), plt.xticks([]), plt.yticks([])    
         plt.show()
     
-######  Or...
-####    cv2.imshow('detected circles',result)
-####    cv2.waitKey(0)
-####    cv2.destroyAllWindows()
-##
