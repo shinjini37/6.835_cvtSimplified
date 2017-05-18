@@ -13,7 +13,7 @@ body {
     background: lightgrey;
 }
 
-#image-holder > img, #result-holder > img, #input-canvas{
+#image-holder > img, #result-holder > img, .interaction-canvas{
     margin: 20px auto;
 }
 
@@ -21,7 +21,7 @@ body {
     color: transparent;
 }
 
-#input-canvas{
+.interaction-canvas{
     position: absolute;
     pointer-events: none;
 }

@@ -3,6 +3,8 @@ import numpy as np
 import math
 
 import general_merge
+import line_merge
+
 import geometry
 
 def get_mean(vals):
@@ -19,8 +21,8 @@ def get_merged_circle(circles):
 
 def check_circle_merge_criteria(ref_circle, test_circle):
     r = ref_circle[2]
-    r_thresh = .1*r
-    cent_dist_thresh = .2*r
+    r_thresh = 10#.1*r
+    cent_dist_thresh = 20#.2*r
     
     merge = False
     r_diff = abs(r - test_circle[2])
@@ -53,16 +55,77 @@ def clean_lines(match_lines_list, lines):
                     if (i not in idxs):
                         temp.append(lines_copy[i])
                 lines_copy = temp
-##                print old_len
-##                print len(temp)
     return lines_copy
+
+def get_match_lines(circle, lines):
+    x = circle[0]
+    y = circle[1]
+    r = circle[2]
+    line_dist_thresh = 5 #min(max(.2*r, 3), 20) #dependent on r
+
+    match_lines = []
+    for line in lines:
+        for x1,y1,x2,y2 in line:
+            diff1 = abs(geometry.get_dist([x1, y1], [x,y]) - r)
+            diff2 = abs(geometry.get_dist([x2, y2], [x,y]) - r)
+            diff3 = abs(geometry.get_dist(geometry.get_midpoint(line), [x,y]) - r)
+
+            length = geometry.get_dist([x1, y1], [x2, y2])
+            if (diff1<line_dist_thresh and diff2<line_dist_thresh and diff3<line_dist_thresh):
+                match_lines.append(line)
+    return match_lines
+
+def is_close(a,b,thresh):
+    return abs(a-b)<thresh
+
+def check_circles(circ1,circ2,cent_thresh,r_thresh):
+    [x, y, r] = circ1
+    [xc, yc, R] = circ2
+    return is_close(xc, x, cent_thresh*R) and is_close(yc, y, cent_thresh*R) and is_close(R, r, r_thresh*R)
+    
+def is_same_circle(circ1,circ2):
+    cent_thresh = 0.025
+    r_thresh = 0.025
+    return check_circles(circ1,circ2,cent_thresh,r_thresh)
+
+def get_best_fit_circle(circle, lines):
+    done = False
+    max_iter = 500
+    num_iter = 0
+    while not done:
+          
+        # check which lines fall close to the circumference of the circle
+        match_lines = get_match_lines(circle, lines)
+        
+        # do circle fit on points and check that the circle is good approx of given
+        points = []
+        for line in match_lines:
+            for x1,y1,x2,y2 in line:
+                points.append([x1, y1])
+                points.append([x2, y2])
+                points.append(geometry.get_midpoint(line))
+        if len(points)>0:
+            xc, yc, R, residu = circle_fit(points)
+            got_circle = [xc, yc, R]
+
+            if  is_same_circle(circle, got_circle):
+                done = True
+            else:
+                circle = got_circle
+        else:
+            return None, None, None
+        
+        num_iter += 1
+        if num_iter>max_iter:
+            done = True
+
+    return circle, match_lines, residu
     
 def get_best_circles(circles, lines):
-##    print len(circles[0])
-    line_dist_thresh = 20 #scale dependent but not dependent on r
+    residu_thresh = 0.5
+    ratio_thres = .7
+    radius_thresh = 5
     
-##    angle_thresh = math.radians(30)
-    residu_thresh = .20
     best_circles = []
     got_circles = []
     match_lines_list = []
@@ -70,54 +133,40 @@ def get_best_circles(circles, lines):
         x = circle[0]
         y = circle[1]
         r = circle[2]
-        # check which lines fall close to the circumference of the circle
-        match_lines = []
-        line_length = 0
-        for line in lines:
-            for x1,y1,x2,y2 in line:
-                diff1 = abs(geometry.get_dist([x1, y1], [x,y]) - r)
-                diff2 = abs(geometry.get_dist([x2, y2], [x,y]) - r)
-                diff3 = abs(geometry.get_dist(geometry.get_midpoint(line), [x,y]) - r)
+        got_circle, match_lines, residu = get_best_fit_circle(circle, lines)
+        if got_circle is None:
+            continue
 
-                length = geometry.get_dist([x1, y1], [x2,y2])
-                if (diff1<line_dist_thresh and diff2<line_dist_thresh and diff3<line_dist_thresh):
-##                    if (length< angle_thresh*r):
-                    match_lines.append(line)
-                    line_length += length
-##        print match_lines
-        # do circle fit on points and check that the circle is good approx of given
-        points = []
-        for line in match_lines:
-            for x1,y1,x2,y2 in line:
-                points.append([x1, y1])
-                points.append([x2, y2])
-
-        arc_length = 2*math.pi*r
-        ratio = line_length/float(arc_length)
-        if ratio>.90:
-            xc, yc, R, residu = circle_fit(points)
-            got_circle = [xc, yc, R]
-            diff_x = abs(xc-x)
-            diff_y = abs(yc-y)
-            diff_r = abs(R-r)
-##            print match_lines
-##            print residu, R
-##            print residu/R
+        cont = True
+        R = got_circle[2]
+        for already_got_circle in got_circles:
+            if is_same_circle(already_got_circle, got_circle):
+                cont = False
+                break
+        if (cont):
+            if (R>radius_thresh): 
+                if (residu<residu_thresh):        
+                    arc_length = 2*math.pi*R
+                    line_length = 0
+                    for line in match_lines:
+                        length = geometry.get_line_length(line)
+                        line_length += length
+                    ratio = line_length/float(arc_length)
+                    if ratio>ratio_thres:
+                        line_length = 0
+                        merged_lines = line_merge.merge_lines(match_lines, circle=True)
+                        for line in merged_lines:
+                            length = geometry.get_line_length(line)
+                            line_length += length 
+                        ratio = line_length/float(arc_length)
+                            
+                        if ratio>ratio_thres:
+                            best_circles.append(circle)#(circle, got_circle, match_lines))
+                            got_circles.append(got_circle)
+                            match_lines_list.append(match_lines)
             
-            if (residu<residu_thresh*R):
-                best_circles.append((circle, got_circle, match_lines))
-                got_circles.append(got_circle)
-                match_lines_list.append(match_lines)
-        
-
-##    print len(got_circles)
-##    print got_circles
     got_circles = general_merge.merge(got_circles, get_merged_circle, check_circle_merge_criteria)
-##    print len(got_circles)
-##    print got_circles
-    
-##    print len(best_circles)
-##    print best_circles
+
     cleaned_lines = clean_lines(match_lines_list, lines)
     return got_circles, cleaned_lines, best_circles
             
@@ -145,11 +194,7 @@ def circle_fit(points):
     xc, yc = center
     Ri       = calc_R(x, y, *center)
     R        = Ri.mean()
-    residu   = np.sum((Ri - R)**2)/len(Ri)#math.pow(np.sum((Ri - R)**2), .5)/len(Ri)
+    residu   = math.pow(np.sum((Ri - R)**2), .5)/len(Ri)
 
     return xc, yc, R, residu
      
-
-##print clean_lines([[[[1, 1, 1, 1]]]], [[[1, 1, 1, 1]], [[1, 1, 2, 1]]])
-##print clean_lines([[[[1, 1, 1, 1]]]], [[[1, 1, 1, 1]], [[1, 1, 1, 1]]])
-##print clean_lines([[[[1, 1, 1, 1]], [[1, 1, 1, 2]]]], [[[1, 1, 1, 1]], [[1, 1, 1, 1]]])

@@ -27,14 +27,24 @@ var Skew = function(){
         ratio = newRatio;
     };
 
+    that.getRatio = function(){
+        return ratio;
+    };
+
     /**
-     * Inputs expected to be in app scale
+     * Inputs expected to be in app scale, or from server specified
      * @param newPoint
      */
-    that.updatePoints = function(newPoint){
+    that.updatePoints = function(newPoint, fromServer){
         var bestDist = Infinity;
         var bestIdx = -1;
-        var corner = [newPoint[0]*ratio, newPoint[1]*ratio];
+        var corner;
+        if (fromServer){
+            corner = newPoint;
+        } else {
+            corner = [newPoint[0]*ratio, newPoint[1]*ratio];
+
+        }
 
         points.forEach(function(point, idx){
             var dist = Math.pow(Math.pow((point[0]-corner[0]),2) + Math.pow((point[1]-corner[1]), 2), .5);
