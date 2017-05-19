@@ -9,15 +9,15 @@ import geometry
 import time
 
 
-## **** To run manually, uncomment "testing = False" and
+## **** To run manually, comment out "testing = False" and
 ## put the pathname of the desired file instead
 ## of "path = 'test_lib/crop_6.jpg'" ****
     
 save_pics = True
-##save_pics = False
+save_pics = False
 
 testing = True
-##testing = False
+testing = False
 
 if not testing:
     path = raw_input()
@@ -84,7 +84,7 @@ def get_lines(img, ref_img = None, params = None):
     if blur is not None:
         inv_img = cv2.medianBlur(inv_img,blur)
     if (ref_img is None):
-        ref_img = cv2.cvtColor(inv_img,cv2.COLOR_GRAY2BGR)
+        ref_img = cv2.cvtColor(img,cv2.COLOR_GRAY2BGR)
     
     line_img = ref_img
 
@@ -99,7 +99,7 @@ def get_lines(img, ref_img = None, params = None):
             cv2.line(line_img,(x1,y1),(x2,y2),(0,255,0), 1)
     
     blank_image = cv2.cvtColor(blank_image,cv2.COLOR_BGR2GRAY)
-
+    
     return (line_img, lines, blank_image)
 
 
@@ -327,7 +327,7 @@ if (img is not None):
 
     result = ref_img
         
-    result, lines, bin_lines = get_lines(img_bin, ref_img = ref_img)
+    result, lines, bin_lines = get_lines(img_bin, ref_img = None)
 
     result, circles, cleaned_lines = get_circles(img_bin, help_lines = lines, ref_img = ref_img)
     
@@ -341,19 +341,23 @@ if (img is not None):
             return_lines.append([[x1,y1],[x2,y2]])
 
     print return_lines
-    print 'num lines: ', len(return_lines)
+
     print circles
-    print 'num circles: ', len(circles)
 
     end = time.time()
-    print 'time: ', (end - start)
 
     if not testing:
         utils.write_result(result = result, save_copy=save_pics)
     else:
-        plt.subplot(121), plt.imshow(img_bin,cmap = 'gray')
+        print 'num lines: ', len(return_lines)
+        print 'num circles: ', len(circles)
+        print 'time: ', (end - start)
+
+        plt.subplot(131), plt.imshow(orig_img,cmap = 'gray')
         plt.title('Original Image'), plt.xticks([]), plt.yticks([])
-        plt.subplot(122),plt.imshow(result,cmap = 'gray')
+        plt.subplot(132), plt.imshow(img_bin,cmap = 'gray')
+        plt.title('Binarized Image'), plt.xticks([]), plt.yticks([])
+        plt.subplot(133),plt.imshow(result,cmap = 'gray')
         plt.title('Result Image'), plt.xticks([]), plt.yticks([])    
         plt.show()
     
