@@ -31,7 +31,7 @@ def write_result(image=None, result=None, save_copy=False):
     if (result is not None):
         cv2.imwrite('./public/images/result.png', result)
         if save_copy:
-            filename = './python/tests/'+datetime.now().strftime('%Y-%m-%d-%H-%M-%S')+'.png'
+            filename = './python/results/'+datetime.now().strftime('%Y-%m-%d-%H-%M-%S')+'.png'
             cv2.imwrite(filename, result)
         
     
