@@ -9,7 +9,7 @@ def merge_helper(lines, merge_group, check_merge_criteria):
     
     remaining_lines = lines[:]
     
-    seed_idx = 0 #random.choice(range(len(lines)))
+    seed_idx = 0
     seed_line = lines[seed_idx]
     groups = [[seed_line]]
     to_remove_idxs = [0]
@@ -34,13 +34,7 @@ def merge_helper(lines, merge_group, check_merge_criteria):
 
     for group in groups:
         merged_line = merge_group(group)
-##        print group
-##        for line in group:
-##            print get_angle(line)
-##        print merged_line
-##        print get_angle(merged_line)
         merged_lines.append(merged_line)
-##    print len(groups)
     return merged_lines
 
 def merge(lines, merge_group, check_merge_criteria):
