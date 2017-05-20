@@ -27,7 +27,7 @@ For Windows, after downloading:
 6. Finally, go to Python27\Lib\site-packages and paste cv2.pyd
 
 ### Proper version:
-This is the full version of the current application. This has the core fuctionality of detecting lines and circles, but also comes with the added features of easy uploading, and of allowing the user to manually select the corners of the page and run the algorithm again (useful in case the algorithm messed up by itself).
+This is the full version of the current application. This has the core functionality of detecting lines and circles, but also comes with the added features of easy uploading, and of allowing the user to manually select the corners of the page and run the algorithm again (useful in case the algorithm incorrectly detected the corners).
 
 You will need node.js, available from https://nodejs.org/en/download/
 
