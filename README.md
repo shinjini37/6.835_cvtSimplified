@@ -8,13 +8,15 @@ For 6.835 Intellegent Multimodal User Interfaces
 
 ### Basics:
 You will need:
-1. Python 2.7
-2. OpenCV v3
-3. numpy
-4. scipy
-5. matplotlib
+1. Python 2.7 (2.7.13)
+2. OpenCV 3 (3.2.0)
+3. Numpy (1.11.3)
+4. Scipy (0.19.0)
+5. Matplotlib (1.5.3)
 
-You can download OpenCV v3 from https://sourceforge.net/projects/opencvlibrary/
+The versions used in the project are listed in parenthesis. The latest versions of the libraries should also work. Numpy, scipy and matplotlib can be downloaded using pip, which comes with the latest download of python 2.7.
+
+You can download OpenCV 3 from https://sourceforge.net/projects/opencvlibrary/
 
 For Windows, after downloading: 
 1. Extract it
@@ -49,4 +51,4 @@ This is the core of the application, with the line and circle detection. This in
 (Be sure to close the display window before running the script again, or else the program will pretend to crash.)
 
 ## Interpretation:
-The yellow lines are the detected lines and the purple circles are the detected circles.
+The yellow/cyan lines are the detected lines and the purple circles are the detected circles.

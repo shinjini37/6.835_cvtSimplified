@@ -90,7 +90,7 @@ router.post('/upload', upload.single('file'), function(req, res, next) {
             console.log(1, width, height);
         };
         runPython(scriptName, inputs, onMessage, function(err){
-            if (err) throw err;
+            if (err) console.log(err);
             console.log(2, width, height);
             res.json({success:true, ratio: RATIO, height: height, width: width});
         });
@@ -112,7 +112,7 @@ router.get('/result', function(req, res, next) {
     };
 
     var onDone = function(err){
-        if (err) throw err;
+        if (err) console.log(err);
         console.log('finished');
         res.json({success:true, messages:messages});
     };
@@ -139,7 +139,7 @@ router.post('/corners', function(req, res, next) {
     };
 
     var onDone = function(err){
-        if (err) throw err;
+        if (err) console.log(err);
         console.log('finished');
         res.json({success:true, messages:messages});
     };
