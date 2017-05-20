@@ -33,6 +33,8 @@ You will need node.js, available from https://nodejs.org/en/download/
 
 After installing, make sure node.js is in your path. For Windows, the path variable is C:\Users\username\AppData\Roaming\npm
 
+If you don't want the results to be saved (in path_to_project/python/results/), then uncomment "save_pics = False" (line 17) in path_to_project/python/main.js.
+
 Then, from the commandline:
 1. Go to the folder containing the downloaded project (the folder with this README)
 2. Type "npm install" (without quotes) and press enter (this downloads necessary packages to run the application)
@@ -43,7 +45,7 @@ Then, from the commandline:
 This is the core of the application, with the line and circle detection. This involves inputting the image manually into the main python script and outputs the results as an image. 
 
 
-1. Open python/main.py in any editor
+1. Open path_to_project/python/main.py in any editor
 2. Comment out "testing = False" (line 21) and
 3. Put the pathname of the desired file instead of "path = 'test_lib/crop_6.jpg'" (line 27)
 4. Run main.py
