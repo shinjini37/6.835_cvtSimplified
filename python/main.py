@@ -14,7 +14,7 @@ import time
 ## of "path = 'test_lib/crop_6.jpg'" ****
     
 save_pics = True
-save_pics = False
+##save_pics = False
 
 testing = True
 testing = False
